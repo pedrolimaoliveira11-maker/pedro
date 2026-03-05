@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universo Estrelado e Terra</title>
+    <title>Terra - Modo Claro/Escuro</title>
     <style>
         /* Variáveis de cores para facilitar a troca */
         :root {
-            --bg-color: #000000; /* Fundo principal preto */
+            --bg-color: #050505;
             --text-color: #ffffff;
             --container-shadow: rgba(70, 130, 180, 0.5);
             --btn-bg: #ffffff;
@@ -34,85 +34,13 @@
             color: var(--text-color);
             font-family: 'Segoe UI', sans-serif;
             flex-direction: column;
-            transition: background-color 0.4s, color 0.4s;
-            overflow: hidden; /* Importante para o fundo */
-            position: relative;
+            transition: background-color 0.4s, color 0.4s; /* Transição suave */
         }
-
-        /* Fundo de universo principal */
-        .universe-background {
-            position: fixed; /* Fixado para o efeito paralaxe */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1508615070457-7ba43fdc3e07?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTIyMjh8MHwxfHNlYXJjaHw4fHxzcGFjZSUyMG5pZ2h0JTIwc2t5fGVufDB8fHx8MTcwMDgxNTA5OHww&ixlib=rb-4.0.3&q=80&w=1080');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.7; /* Levemente transparente */
-            z-index: -2; /* Mais ao fundo */
-            transition: opacity 0.6s ease-in-out;
-        }
-
-        /* Oculta o fundo do universo no modo claro */
-        .light-mode .universe-background {
-            opacity: 0;
-        }
-
-        /* Estrelas - Camada 1 */
-        .stars1 {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABTUlEQVR4nO2WsUrDUBCGvyG0K2/lIuDgxZ06uA5dXB0dXAwdxB+A2lXBrZ3ExW0Jro6u/AKO1q4u/AItl47kIuCi2pYkSSo3O4QJ+3gJjuGjD+eY5jMdwS/1l44Y9n08wQcR6Xo+A9+t9uYf0fLpW4P8y4d4iP0Y/B7Ff4x7/J9yHk29A7885L5XJ/Mvz8t90z0Ym40Yj08T8l5f+Y95/J/xX3vD+Q9Fv+Qd1v8f8Fp/P9e97Yf5H0y7wz/xGzL3fJ8+Z9v/8i/s8z9/hI/yL/u9eO/2W89/8if5v9S791/yP+Fm/3/qD/wQ6e7/0h/5w3e9f4Qf4M/g9H++31J+4Uf5m/1/vL/9H/3v7X70h/4Y/P+f/qXg/8vH/kZ9X9f/2j/Bv/g93++29Gf/P/2Q30B480Y+AAAAABJRU5ErkJggg=='); /* Imagem de estrelas pequenas */
-            background-size: 50px 50px; /* Tamanho das "estrelas" */
-            animation: moveStars1 150s linear infinite;
-            z-index: -1; /* Um pouco mais próximo que o fundo */
-            opacity: 0.5;
-            transition: opacity 0.6s ease-in-out;
-        }
-
-        /* Estrelas - Camada 2 (mais lenta, para paralaxe) */
-        .stars2 {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABTUlEQVR4nO2WsUrDUBCGvyG0K2/lIuDgxZ3cuA5dXB0dXAwdxB+A2lXBrZ3ExW0Jro6u/AKO1q4u/AItl47kIuCi2pYkSSo3O4QJ+3gJjuGjD+eY5jMdwS/1l44Y9n08wQcR6Xo+A9+t9uYf0fLpW4P8y4d4iP0Y/B7Ff4x7/J9yHk29A7885L5XJ/Mvz8t90z0Ym40Yj08T8l5f+Y95/J/xX3vD+Q9Fv+Qd1v8f8Fp/P9e97Yf5H0y7wz/xGzL3fJ8+Z9v/8i/s8z9/hI/yL/u9eO/2W89/8if5v9S791/yP+Fm/3/qD/wQ6e7/0h/5w3e9f4Qf4M/g9H++31J+4Uf5m/1/vL/9H/3v7X70h/4Y/P+f/qXg/8vH/kZ9X9f/2j/Bv/g93++29Gf/P/2Q30B480Y+AAAAABJRU5ErkJggg=='); /* Imagem de estrelas maiores/mais próximas */
-            background-size: 70px 70px;
-            animation: moveStars2 200s linear infinite; /* Mais lento */
-            z-index: -0.5; /* Ainda mais próximo */
-            opacity: 0.3;
-            transition: opacity 0.6s ease-in-out;
-        }
-
-        /* Oculta as estrelas no modo claro */
-        .light-mode .stars1,
-        .light-mode .stars2 {
-            opacity: 0;
-        }
-
-        /* Animação para mover as estrelas */
-        @keyframes moveStars1 {
-            from { background-position: 0 0; }
-            to { background-position: -10000px -10000px; }
-        }
-
-        @keyframes moveStars2 {
-            from { background-position: 0 0; }
-            to { background-position: -20000px -20000px; } /* Movimento maior e mais lento */
-        }
-
 
         /* Botão de Alternância */
         .theme-toggle {
             position: absolute;
             top: 20px;
-            right: 20px;
             padding: 10px 20px;
             cursor: pointer;
             border: none;
@@ -122,7 +50,6 @@
             font-weight: bold;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             transition: transform 0.2s;
-            z-index: 10;
         }
 
         .theme-toggle:active {
@@ -135,10 +62,9 @@
             width: 250px;
             height: 250px;
             border-radius: 50%;
-            box-shadow: 0 0 50px var(--container-shadow);
+            box-shadow: 0 0 50px var(--container-shadow); 
             overflow: hidden;
             transition: box-shadow 0.4s;
-            z-index: 1;
         }
 
         .terra-img {
@@ -163,17 +89,12 @@
             margin-top: 20px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            z-index: 1;
         }
     </style>
 </head>
 <body>
 
-    <div class="universe-background"></div>
-    <div class="stars1"></div>
-    <div class="stars2"></div>
-
-    <button class="theme-toggle" onclick="toggleTheme()">Modo Claro</button>
+    <button class="theme-toggle" onclick="toggleTheme()">Trocar Tema</button>
 
     <div class="terra-container">
         <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=600&q=80" 
@@ -185,8 +106,10 @@
 
     <script>
         function toggleTheme() {
+            // Adiciona ou remove a classe 'light-mode' do corpo da página
             document.body.classList.toggle('light-mode');
             
+            // Opcional: Mudar o texto do botão
             const btn = document.querySelector('.theme-toggle');
             if (document.body.classList.contains('light-mode')) {
                 btn.textContent = "Modo Escuro";

@@ -3,55 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Olá Mundo</title>
-</head>
-<body>
-    <h1>Olá, Mundo!</h1>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Olá Mundo com Estilo</title>
+    <title>Terra - Modo Claro/Escuro</title>
     <style>
-        /* O CSS começa aqui */
-        body {
-            background-color: #f0f2f5; /* Cor de fundo leve */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh; /* Ocupa a altura inteira da tela */
-            margin: 0;
+        /* Variáveis de cores para facilitar a troca */
+        :root {
+            --bg-color: #050505;
+            --text-color: #ffffff;
+            --container-shadow: rgba(70, 130, 180, 0.5);
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
         }
 
-        h1 {
-            color: #2c3e50;
-            font-size: 3rem;
-            margin-bottom: 10px;
+        /* Cores do Modo Claro */
+        .light-mode {
+            --bg-color: #f0f2f5;
+            --text-color: #2c3e50;
+            --container-shadow: rgba(0, 0, 0, 0.2);
+            --btn-bg: #2c3e50;
+            --btn-text: #ffffff;
         }
 
-        p {
-            color: #7f8c8d;
-            font-size: 1.2rem;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 5px;
-        }
-    </style>
-</head>
-<body>
-
-    <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planeta Terra</title>
-    <style>
-        /* Estilização do Fundo */
         body {
             margin: 0;
             padding: 0;
@@ -59,24 +30,43 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #050505; /* Cor do espaço */
-            color: white;
-            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
             flex-direction: column;
+            transition: background-color 0.4s, color 0.4s; /* Transição suave */
         }
 
-        /* Container da Imagem */
+        /* Botão de Alternância */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 20px;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* Container da Terra */
         .terra-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 250px;
+            height: 250px;
             border-radius: 50%;
-            /* Sombra externa para brilho atmosférico */
-            box-shadow: 0 0 50px rgba(70, 130, 180, 0.5); 
+            box-shadow: 0 0 50px var(--container-shadow); 
             overflow: hidden;
+            transition: box-shadow 0.4s;
         }
 
-        /* A Imagem da Terra */
         .terra-img {
             width: 100%;
             height: 100%;
@@ -84,7 +74,6 @@
             display: block;
         }
 
-        /* Efeito de sombra interna para parecer uma esfera */
         .terra-container::after {
             content: "";
             position: absolute;
@@ -92,31 +81,43 @@
             left: 0;
             width: 100%;
             height: 100%;
-            box-shadow: inset 20px -20px 50px rgba(0, 0, 0, 0.8), 
-                        inset -5px 5px 15px rgba(255, 255, 255, 0.2);
+            box-shadow: inset 20px -20px 50px rgba(0, 0, 0, 0.6);
             border-radius: 50%;
         }
 
         h1 {
             margin-top: 20px;
-            font-weight: 300;
             letter-spacing: 2px;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
+    <button class="theme-toggle" onclick="toggleTheme()">Trocar Tema</button>
+
     <div class="terra-container">
         <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=600&q=80" 
-             alt="Planeta Terra visto do espaço" 
+             alt="Terra" 
              class="terra-img">
     </div>
 
-    <p>PLANETA TERRA</p> 
-    
-</body>
-</html>
-    <h1>Olá, Mundo!</h1>
-    <p>.</p>
+    <h1>Planeta Terra</h1>
+
+    <script>
+        function toggleTheme() {
+            // Adiciona ou remove a classe 'light-mode' do corpo da página
+            document.body.classList.toggle('light-mode');
+            
+            // Opcional: Mudar o texto do botão
+            const btn = document.querySelector('.theme-toggle');
+            if (document.body.classList.contains('light-mode')) {
+                btn.textContent = "Modo Escuro";
+            } else {
+                btn.textContent = "Modo Claro";
+            }
+        }
+    </script>
+
 </body>
 </html>

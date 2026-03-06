@@ -2,183 +2,70 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universo com Planetas</title>
+    <title>Judo Combat - CSS Edition</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
+        :root {
+            --tatame: #2c3e50;
+            --judogi-white: #fdfdfd;
+            --judogi-blue: #2980b9;
+        }
+
+        body {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            background-color: #ecf0f1;
             font-family: 'Arial', sans-serif;
-            color: white;
         }
 
-        /* Container para os planetas e estrelas de fundo */
-        .universo-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2; /* Fica abaixo de tudo */
-            background: radial-gradient(circle at center, rgba(10, 0, 30, 0.8) 0%, rgba(0,0,0,1) 100%);
-        }
-
-        /* Estilos para os planetas gerados via JS */
-        .planeta-fundo {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.6;
-            filter: blur(1px); /* Suaviza a borda */
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-            animation: fadeIn 2s ease-out forwards; /* Animação de entrada */
-        }
-
-        /* Estilos para as estrelas geradas via JS */
-        .estrela {
-            position: absolute;
-            background-color: white;
-            border-radius: 50%;
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
-            opacity: 0; /* Começa invisível para animar */
-            animation: twinkle 4s infinite alternate, fadeIn 2s ease-out forwards;
-        }
-
-        /* 2. O Planeta Terra Central */
-        .terra {
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
+        /* Arena de Luta */
+        .dojo {
             position: relative;
-            z-index: 1; /* Fica acima dos planetas de fundo */
-            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Solarsystemscope_texture_2k_earth_daymap.jpg/1280px-Solarsystemscope_texture_2k_earth_daymap.jpg');
-            background-size: auto 100%;
-            box-shadow: 
-                inset 15px 0 30px rgba(0,0,0,0.9),
-                inset -5px 0 15px rgba(255,255,255,0.2),
-                0 0 50px rgba(0, 100, 255, 0.3);
-            animation: giraTerra 20s linear infinite;
+            width: 600px;
+            height: 300px;
+            background-color: var(--tatame);
+            border: 10px solid #c0392b;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            overflow: hidden;
+            margin-top: 50px;
         }
 
-        .terra::before {
-            content: "";
+        /* Personagens (Shapes Básicos) */
+        .judoca {
+            width: 60px;
+            height: 100px;
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%;
-            box-shadow: inset -20px 0 20px rgba(0,0,0,0.5);
+            bottom: 20px;
+            transition: transform 0.5s ease;
+        }
+
+        .player {
+            background-color: var(--judogi-white);
+            left: 200px;
+            border-radius: 5px 5px 0 0;
             z-index: 2;
         }
 
-        h1 {
-            margin-top: 30px;
-            font-size: 2.5rem;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(0, 162, 255, 0.8);
-            z-index: 10;
+        .enemy {
+            background-color: var(--judogi-blue);
+            right: 200px;
+            border-radius: 5px 5px 0 0;
         }
 
-        /* Animações */
-        @keyframes giraTerra {
-            from { background-position: 0 0; }
-            to { background-position: 500px 0; }
+        /* Lógica do Golpe usando Checkbox */
+        #attack-trigger { display: none; }
+
+        .btn-attack {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 0.6; } /* Para planetas */
-        }
-
-        @keyframes twinkle {
-            0% { opacity: 0.3; }
-            50% { opacity: 1; }
-            100% { opacity: 0.3; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="universo-bg"></div>
-
-    <div class="terra"></div>
-    <h1>Olá Mundo</h1>
-
-    <script>
-        const universoBg = document.querySelector('.universo-bg');
-        const numEstrelas = 150; // Quantidade de estrelas
-        const numPlanetas = 10;  // Quantidade de planetas de fundo
-
-        // Cores e URLs para os planetas de fundo
-        const planetColors = [
-            '#6a05ad', '#3d0251', '#e74c3c', '#e67e22', '#f1c40f',
-            '#27ae60', '#3498db', '#9b59b6', '#34495e', '#ecf0f1'
-        ];
-        const planetTextures = [
-            'radial-gradient(circle, #ff0077 0%, #aa0044 100%)', // Planeta rosa/vermelho
-            'radial-gradient(circle, #5e005e 0%, #3e003e 100%)', // Planeta roxo
-            'linear-gradient(45deg, #1a2a6c, #b21f1f, #fdbb2d)', // Planeta com gradiente de cores
-            'url("https://cdn.pixabay.com/photo/2016/11/22/23/09/surface-1851214_960_720.jpg")', // Textura rochosa
-            'url("https://cdn.pixabay.com/photo/2017/08/30/01/05/jupiter-2694389_960_720.jpg")' // Textura gasosa
-        ];
-
-        // Função para criar estrelas
-        function createStar() {
-            const estrela = document.createElement('div');
-            estrela.className = 'estrela';
-            estrela.style.width = `${Math.random() * 2 + 1}px`; // 1 a 3px
-            estrela.style.height = estrela.style.width;
-            estrela.style.left = `${Math.random() * 100}vw`;
-            estrela.style.top = `${Math.random() * 100}vh`;
-            estrela.style.animationDelay = `${Math.random() * 2}s`; // Começa em tempos diferentes
-            universoBg.appendChild(estrela);
-        }
-
-        // Função para criar planetas de fundo
-        function createBackgroundPlanet() {
-            const planeta = document.createElement('div');
-            planeta.className = 'planeta-fundo';
-            const size = Math.random() * 80 + 20; // Tamanho entre 20px e 100px
-            planeta.style.width = `${size}px`;
-            planeta.style.height = `${size}px`;
-            planeta.style.left = `${Math.random() * 100}vw`;
-            planeta.style.top = `${Math.random() * 100}vh`;
-
-            // Escolhe uma cor ou textura aleatória
-            const useTexture = Math.random() > 0.5; // 50% de chance de usar textura
-            if (useTexture && planetTextures.length > 0) {
-                const texture = planetTextures[Math.floor(Math.random() * planetTextures.length)];
-                if (texture.startsWith('url')) {
-                    planeta.style.backgroundImage = texture;
-                    planeta.style.backgroundSize = 'cover';
-                } else {
-                    planeta.style.background = texture;
-                }
-            } else {
-                planeta.style.backgroundColor = planetColors[Math.floor(Math.random() * planetColors.length)];
-            }
-            
-            // Ajusta o z-index para que planetas maiores fiquem mais "atrás"
-            planeta.style.zIndex = Math.floor(size / 10); 
-
-            universoBg.appendChild(planeta);
-        }
-
-        // Gerar estrelas
-        for (let i = 0; i < numEstrelas; i++) {
-            createStar();
-        }
-
-        // Gerar planetas de fundo
-        for (let i = 0; i < numPlanetas; i++) {
-            createBackgroundPlanet();
-        }
-    </script>
-</body>
-</html>
+        /* Animação do Ippon Seoi Nage (Proje

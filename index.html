@@ -3,108 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Olá Mundo Espacial</title>
+    <title>Terra no Espaço</title>
     <style>
-        /* 1. Configuração do Espaço */
+        /* 1. O Vazio do Espaço */
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #020205;
+            background-color: #00050a;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
             color: white;
         }
 
-        .universo {
+        /* Estrelas de Fundo */
+        .estrelas-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #0f0123 0%, #020205 100%);
+            background-image: 
+                radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+                radial-gradient(1.5px 1.5px at 50% 50%, #fff, transparent),
+                radial-gradient(1px 1px at 80% 30%, #fff, transparent),
+                radial-gradient(2px 2px at 20% 70%, #fff, transparent),
+                radial-gradient(1.5px 1.5px at 70% 80%, #fff, transparent);
+            background-size: 200px 200px;
+            animation: moveEstrelas 100s linear infinite;
         }
 
-        /* 2. Estrelas Animadas */
-        .estrelas {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
+        /* 2. O Planeta Terra */
+        .terra {
+            width: 250px;
+            height: 250px;
             border-radius: 50%;
-            box-shadow: 
-                20vw 10vh #fff, 80vw 20vh #fff, 50vw 50vh #fff, 
-                10vw 80vh #fff, 90vw 90vh #fff, 30vw 40vh #aaa,
-                70vw 60vh #fff, 25vw 15vh #fff, 75vw 10vh #aaa;
-            animation: twinkle 5s infinite alternate;
-        }
-
-        /* 3. O Planeta */
-        .container {
-            text-align: center;
-            z-index: 10;
-        }
-
-        .planeta {
-            width: 200px;
-            height: 200px;
-            background: #2a4d69; /* Cor base (Oceano) */
-            border-radius: 50%;
-            margin: 0 auto 20px;
             position: relative;
             
-            /* Efeito de Textura e Rotação */
-            background-image: repeating-linear-gradient(
-                90deg,
-                transparent 0,
-                transparent 50px,
-                rgba(34, 139, 34, 0.6) 50px,
-                rgba(34, 139, 34, 0.6) 100px
-            );
-            background-size: 200% 100%;
+            /* Textura da Terra (Simulada com Gradiente para não precisar de arquivo externo) */
+            /* Se tiver uma imagem de mapa, troque o gradient por url('sua-imagem.jpg') */
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Solarsystemscope_texture_2k_earth_daymap.jpg/1280px-Solarsystemscope_texture_2k_earth_daymap.jpg');
+            background-size: auto 100%;
             
-            /* Sombra interna para parecer uma esfera (3D) */
+            /* Efeito de Esfera e Iluminação */
             box-shadow: 
-                inset -30px -30px 50px #000, 
-                0 0 20px rgba(0, 150, 255, 0.3);
+                inset 15px 0 30px rgba(0,0,0,0.9),  /* Sombra do lado escuro */
+                inset -5px 0 15px rgba(255,255,255,0.2), /* Brilho da borda iluminada */
+                0 0 50px rgba(0, 100, 255, 0.3); /* Brilho da atmosfera */
             
-            animation: rotatePlaneta 8s linear infinite;
+            animation: giraTerra 20s linear infinite;
+        }
+
+        /* Reflexo da Atmosfera (A aura azulada) */
+        .terra::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 50%;
+            box-shadow: inset -20px 0 20px rgba(0,0,0,0.5);
+            z-index: 2;
         }
 
         h1 {
-            font-size: 3rem;
+            margin-top: 30px;
+            font-size: 2.5rem;
+            letter-spacing: 8px;
             text-transform: uppercase;
-            letter-spacing: 5px;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            text-shadow: 0 0 20px rgba(0, 162, 255, 0.8);
+            z-index: 10;
         }
 
-        /* 4. Animações */
-        @keyframes rotatePlaneta {
+        /* 3. Animações */
+        @keyframes giraTerra {
             from { background-position: 0 0; }
-            to { background-position: -400px 0; }
+            to { background-position: 500px 0; } /* Ajuste conforme o tamanho da imagem */
         }
 
-        @keyframes twinkle {
-            0% { opacity: 0.3; }
-            100% { opacity: 1; }
+        @keyframes moveEstrelas {
+            from { transform: translateY(0); }
+            to { transform: translateY(-1000px); }
         }
     </style>
 </head>
 <body>
 
-    <div class="universo">
-        <div class="estrelas"></div>
-    </div>
+    <div class="estrelas-bg"></div>
 
-    <div class="container">
-        <div class="planeta"></div>
-        <h1>Olá Mundo</h1>
-    </div>
+    <div class="terra"></div>
+    <h1>Olá Mundo</h1>
 
 </body>
 </html>

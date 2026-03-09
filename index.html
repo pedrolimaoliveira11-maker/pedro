@@ -2,70 +2,109 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Judo Combat - CSS Edition</title>
+    <title>CSS Street Fighter Clone</title>
     <style>
-        :root {
-            --tatame: #2c3e50;
-            --judogi-white: #fdfdfd;
-            --judogi-blue: #2980b9;
-        }
-
+        /* Cenário */
         body {
+            margin: 0;
+            background: #222;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            background-color: #ecf0f1;
+            height: 100vh;
+            overflow: hidden;
             font-family: 'Arial', sans-serif;
         }
 
-        /* Arena de Luta */
-        .dojo {
+        #cenario {
             position: relative;
-            width: 600px;
-            height: 300px;
-            background-color: var(--tatame);
-            border: 10px solid #c0392b;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
+            width: 800px;
+            height: 400px;
+            background: linear-gradient(to bottom, #444 70%, #222 70%);
+            border: 5px solid #fff;
             overflow: hidden;
-            margin-top: 50px;
         }
 
-        /* Personagens (Shapes Básicos) */
-        .judoca {
-            width: 60px;
-            height: 100px;
+        /* Personagens */
+        .personagem {
             position: absolute;
-            bottom: 20px;
-            transition: transform 0.5s ease;
+            bottom: 50px;
+            width: 80px;
+            height: 120px;
+            transition: transform 0.1s;
         }
 
-        .player {
-            background-color: var(--judogi-white);
-            left: 200px;
-            border-radius: 5px 5px 0 0;
-            z-index: 2;
+        #player1 {
+            left: 100px;
+            background-color: #3498db; /* Azul */
         }
 
-        .enemy {
-            background-color: var(--judogi-blue);
-            right: 200px;
-            border-radius: 5px 5px 0 0;
+        #player2 {
+            right: 100px;
+            background-color: #e74c3c; /* Vermelho */
+            transform: scaleX(-1);
         }
 
-        /* Lógica do Golpe usando Checkbox */
-        #attack-trigger { display: none; }
+        /* Barra de Vida */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
 
-        .btn-attack {
-            margin-top: 20px;
-            padding: 15px 30px;
-            background-color: #e67e22;
+        .barra-vida {
+            width: 300px;
+            height: 20px;
+            background: #555;
+            border: 2px solid #fff;
+        }
+
+        .vida-cheia {
+            height: 100%;
+            background: #2ecc71;
+            width: 100%;
+            transition: width 0.3s;
+        }
+
+        /* Mecânica de Ataque (Simulação com :active) */
+        #player1:active {
+            transform: translateX(50px) scaleX(1.2);
+            background-color: #f1c40f;
+        }
+
+        /* Animação de idle (respirando) */
+        @keyframes idle {
+            0%, 100% { height: 120px; }
+            50% { height: 115px; }
+        }
+
+        .personagem {
+            animation: idle 1s infinite;
+        }
+
+        /* Instruções */
+        .instrucoes {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
         }
+    </style>
+</head>
+<body>
 
-        /* Animação do Ippon Seoi Nage (Proje
+    <div id="cenario">
+        <div class="instrucoes">CLIQUE E SEGURE NO QUADRADO AZUL PARA ATACAR</div>
+        
+        <div class="hud">
+            <div class="barra-vida"><div class="vida-cheia" id="hp1"></div></div>
+            <div class="barra-vida"><div class="vida-cheia" id="hp2"></div></div>
+        </div>
+
+        <div id="player1" class="personagem"></div>
+        <div id="player2" class="personagem"></div>
+    </div>
+
+</body>
+</html>

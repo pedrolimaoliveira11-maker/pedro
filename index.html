@@ -331,3 +331,60 @@
 </script>
 </body>
 </html>
+/* Nave com formato de Foguete */
+#player {
+    width: 30px;
+    height: 60px;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ecf0f1; /* Corpo do foguete */
+    border-radius: 50% 50% 10% 10%;
+    box-shadow: inset -5px 0 0 #bdc3c7; /* Sombra para dar volume */
+    z-index: 10;
+}
+
+/* Bico do Foguete */
+#player::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: 0;
+    width: 30px;
+    height: 20px;
+    background: #ff4757; /* Cor do bico */
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+/* Asas Laterais e Fogo */
+#player::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: -10px;
+    width: 50px;
+    height: 30px;
+    /* Asas laterais usando background com degradê e transparência */
+    background: linear-gradient(90deg, #ff4757 20%, transparent 20%, transparent 80%, #ff4757 80%);
+    clip-path: polygon(0% 100%, 20% 0%, 80% 0%, 100% 100%);
+    z-index: -1;
+}
+
+/* Efeito de Fogo no Motor */
+.thrust {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 20px;
+    background: linear-gradient(to bottom, #ff9f43, transparent);
+    border-radius: 0 0 50% 50%;
+    animation: flicker 0.1s infinite alternate;
+}
+
+@keyframes flicker {
+    from { height: 15px; opacity: 0.8; }
+    to { height: 25px; opacity: 1; }
+}

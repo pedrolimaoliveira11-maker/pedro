@@ -2,83 +2,115 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Mini Luta JS</title>
+    <title>Duelo de Espadas JS</title>
     <style>
-        body { margin: 0; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; font-family: sans-serif; }
+        body { margin: 0; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; font-family: 'Courier New', Courier, monospace; }
         
         #arena { 
-            position: relative; width: 600px; height: 300px; 
-            background: #333; border: 4px solid #fff; overflow: hidden; 
+            position: relative; width: 700px; height: 350px; 
+            background: #2c3e50; border-bottom: 10px solid #7f8c8d; overflow: hidden; 
         }
 
-        .hud { width: 600px; display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .barra { width: 250px; height: 20px; background: #555; border: 2px solid #fff; }
-        .vida { height: 100%; background: #2ecc71; width: 100%; transition: width 0.1s; }
+        /* Interface */
+        .hud { width: 700px; display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .barra { width: 300px; height: 25px; background: #444; border: 2px solid #ecf0f1; position: relative; }
+        .vida { height: 100%; background: #c0392b; width: 100%; transition: width 0.2s; }
+        .nome { position: absolute; top: -20px; font-weight: bold; }
 
+        /* Personagens */
         .lutador { 
-            position: absolute; bottom: 0; width: 50px; height: 80px; 
-            transition: background 0.1s; 
+            position: absolute; bottom: 10px; width: 40px; height: 90px; 
+            transition: transform 0.1s;
         }
-        #p1 { left: 50px; background: #3498db; }
-        #p2 { right: 50px; background: #e74c3c; }
         
-        .atacando { background: #f1c40f !important; width: 70px !important; }
-        
-        .controles { margin-top: 20px; font-size: 0.8em; color: #aaa; text-align: center; }
+        #p1 { left: 100px; background: #2980b9; }
+        #p2 { right: 100px; background: #d35400; }
+
+        /* As Espadas */
+        .espada {
+            position: absolute;
+            top: 30px;
+            width: 60px;
+            height: 6px;
+            background: #bdc3c7;
+            border: 1px solid #7f8c8d;
+            border-radius: 5px;
+            opacity: 0; /* Invisível até o ataque */
+            transition: transform 0.1s, opacity 0.1s;
+        }
+
+        /* P1 ataca para a direita, P2 para a esquerda */
+        #p1 .espada { left: 40px; transform-origin: left center; }
+        #p2 .espada { right: 40px; transform-origin: right center; }
+
+        /* Animação de Ataque */
+        .atacando .espada {
+            opacity: 1;
+            transform: rotate(45deg); /* Movimento de corte */
+        }
+
+        .controles { margin-top: 30px; padding: 10px; border: 1px dashed #555; border-radius: 8px; }
     </style>
 </head>
 <body>
 
     <div class="hud">
-        <div>P1: <div class="barra"><div id="vida1" class="vida"></div></div></div>
-        <div>P2: <div class="barra"><div id="vida2" class="vida"></div></div></div>
+        <div class="barra"><span class="nome">Cavaleiro Azul</span><div id="vida1" class="vida"></div></div>
+        <div class="barra"><span class="nome">Guerreiro Rubro</span><div id="vida2" class="vida" style="float:right"></div></div>
     </div>
 
     <div id="arena">
-        <div id="p1" class="lutador"></div>
-        <div id="p2" class="lutador"></div>
+        <div id="p1" class="lutador"><div class="espada"></div></div>
+        <div id="p2" class="lutador"><div class="espada"></div></div>
     </div>
 
     <div class="controles">
-        P1: A/D (Move) - Espaço (Ataca) | P2: Setas (Move) - Enter (Ataca)
+        <strong>P1:</strong> A/D - Espaço (Ataque) | <strong>P2:</strong> Setas - Enter (Ataque)
     </div>
 
     <script>
-        const p1 = { el: document.getElementById('p1'), x: 50, hp: 100, hpEl: document.getElementById('vida1') };
-        const p2 = { el: document.getElementById('p2'), x: 500, hp: 100, hpEl: document.getElementById('vida2') };
-        const arenaWidth = 600;
+        const p1 = { el: document.getElementById('p1'), x: 100, hp: 100, hpEl: document.getElementById('vida1'), atacando: false };
+        const p2 = { el: document.getElementById('p2'), x: 560, hp: 100, hpEl: document.getElementById('vida2'), atacando: false };
+        const alcanceEspada = 100;
 
         document.addEventListener('keydown', (e) => {
-            // Controles P1
-            if (e.code === 'KeyA' && p1.x > 0) p1.x -= 15;
-            if (e.code === 'KeyD' && p1.x < p2.x - 50) p1.x += 15;
-            if (e.code === 'Space') atacar(p1, p2);
+            // Movimentação
+            if (e.code === 'KeyA' && p1.x > 0) p1.x -= 20;
+            if (e.code === 'KeyD' && p1.x < p2.x - 40) p1.x += 20;
+            if (e.code === 'ArrowLeft' && p2.x > p1.x + 40) p2.x -= 20;
+            if (e.code === 'ArrowRight' && p2.x < 660) p2.x += 20;
 
-            // Controles P2
-            if (e.code === 'ArrowLeft' && p2.x > p1.x + 50) p2.x -= 15;
-            if (e.code === 'ArrowRight' && p2.x < arenaWidth - 50) p2.x += 15;
+            // Ataques
+            if (e.code === 'Space') atacar(p1, p2);
             if (e.code === 'Enter') atacar(p2, p1);
 
-            atualizarPosicoes();
+            atualizarCenario();
         });
 
-        function atacar(atacante, vitima) {
-            atacante.el.classList.add('atacando');
-            
-            // Checa se está perto o suficiente para acertar (Colisão)
+        function atacar(atq, vit) {
+            if (atq.atacando) return; // Evita spam de ataque
+            atq.atacando = true;
+            atq.el.classList.add('atacando');
+
+            // Verifica se a ponta da espada atinge o corpo do outro
             const distancia = Math.abs(p1.x - p2.x);
-            if (distancia < 80) {
-                vitima.hp -= 10;
-                if (vitima.hp < 0) vitima.hp = 0;
-                vitima.hpEl.style.width = vitima.hp + '%';
+            if (distancia < alcanceEspada) {
+                vit.hp -= 15;
+                if (vit.hp < 0) vit.hp = 0;
+                vit.hpEl.style.width = vit.hp + '%';
                 
-                if (vitima.hp === 0) alert("Nocaute!");
+                if (vit.hp === 0) {
+                    setTimeout(() => { alert("Vitória!"); location.reload(); }, 100);
+                }
             }
 
-            setTimeout(() => atacante.el.classList.remove('atacando'), 200);
+            setTimeout(() => {
+                atq.el.classList.remove('atacando');
+                atq.atacando = false;
+            }, 250);
         }
 
-        function atualizarPosicoes() {
+        function atualizarCenario() {
             p1.el.style.left = p1.x + 'px';
             p2.el.style.left = p2.x + 'px';
         }

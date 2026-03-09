@@ -2,109 +2,86 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>CSS Street Fighter Clone</title>
+    <title>Mini Luta JS</title>
     <style>
-        /* Cenário */
-        body {
-            margin: 0;
-            background: #222;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Arial', sans-serif;
+        body { margin: 0; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; font-family: sans-serif; }
+        
+        #arena { 
+            position: relative; width: 600px; height: 300px; 
+            background: #333; border: 4px solid #fff; overflow: hidden; 
         }
 
-        #cenario {
-            position: relative;
-            width: 800px;
-            height: 400px;
-            background: linear-gradient(to bottom, #444 70%, #222 70%);
-            border: 5px solid #fff;
-            overflow: hidden;
-        }
+        .hud { width: 600px; display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .barra { width: 250px; height: 20px; background: #555; border: 2px solid #fff; }
+        .vida { height: 100%; background: #2ecc71; width: 100%; transition: width 0.1s; }
 
-        /* Personagens */
-        .personagem {
-            position: absolute;
-            bottom: 50px;
-            width: 80px;
-            height: 120px;
-            transition: transform 0.1s;
+        .lutador { 
+            position: absolute; bottom: 0; width: 50px; height: 80px; 
+            transition: background 0.1s; 
         }
-
-        #player1 {
-            left: 100px;
-            background-color: #3498db; /* Azul */
-        }
-
-        #player2 {
-            right: 100px;
-            background-color: #e74c3c; /* Vermelho */
-            transform: scaleX(-1);
-        }
-
-        /* Barra de Vida */
-        .hud {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-        }
-
-        .barra-vida {
-            width: 300px;
-            height: 20px;
-            background: #555;
-            border: 2px solid #fff;
-        }
-
-        .vida-cheia {
-            height: 100%;
-            background: #2ecc71;
-            width: 100%;
-            transition: width 0.3s;
-        }
-
-        /* Mecânica de Ataque (Simulação com :active) */
-        #player1:active {
-            transform: translateX(50px) scaleX(1.2);
-            background-color: #f1c40f;
-        }
-
-        /* Animação de idle (respirando) */
-        @keyframes idle {
-            0%, 100% { height: 120px; }
-            50% { height: 115px; }
-        }
-
-        .personagem {
-            animation: idle 1s infinite;
-        }
-
-        /* Instruções */
-        .instrucoes {
-            position: absolute;
-            top: 10px;
-            width: 100%;
-            text-align: center;
-            color: white;
-        }
+        #p1 { left: 50px; background: #3498db; }
+        #p2 { right: 50px; background: #e74c3c; }
+        
+        .atacando { background: #f1c40f !important; width: 70px !important; }
+        
+        .controles { margin-top: 20px; font-size: 0.8em; color: #aaa; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="cenario">
-        <div class="instrucoes">CLIQUE E SEGURE NO QUADRADO AZUL PARA ATACAR</div>
-        
-        <div class="hud">
-            <div class="barra-vida"><div class="vida-cheia" id="hp1"></div></div>
-            <div class="barra-vida"><div class="vida-cheia" id="hp2"></div></div>
-        </div>
-
-        <div id="player1" class="personagem"></div>
-        <div id="player2" class="personagem"></div>
+    <div class="hud">
+        <div>P1: <div class="barra"><div id="vida1" class="vida"></div></div></div>
+        <div>P2: <div class="barra"><div id="vida2" class="vida"></div></div></div>
     </div>
 
+    <div id="arena">
+        <div id="p1" class="lutador"></div>
+        <div id="p2" class="lutador"></div>
+    </div>
+
+    <div class="controles">
+        P1: A/D (Move) - Espaço (Ataca) | P2: Setas (Move) - Enter (Ataca)
+    </div>
+
+    <script>
+        const p1 = { el: document.getElementById('p1'), x: 50, hp: 100, hpEl: document.getElementById('vida1') };
+        const p2 = { el: document.getElementById('p2'), x: 500, hp: 100, hpEl: document.getElementById('vida2') };
+        const arenaWidth = 600;
+
+        document.addEventListener('keydown', (e) => {
+            // Controles P1
+            if (e.code === 'KeyA' && p1.x > 0) p1.x -= 15;
+            if (e.code === 'KeyD' && p1.x < p2.x - 50) p1.x += 15;
+            if (e.code === 'Space') atacar(p1, p2);
+
+            // Controles P2
+            if (e.code === 'ArrowLeft' && p2.x > p1.x + 50) p2.x -= 15;
+            if (e.code === 'ArrowRight' && p2.x < arenaWidth - 50) p2.x += 15;
+            if (e.code === 'Enter') atacar(p2, p1);
+
+            atualizarPosicoes();
+        });
+
+        function atacar(atacante, vitima) {
+            atacante.el.classList.add('atacando');
+            
+            // Checa se está perto o suficiente para acertar (Colisão)
+            const distancia = Math.abs(p1.x - p2.x);
+            if (distancia < 80) {
+                vitima.hp -= 10;
+                if (vitima.hp < 0) vitima.hp = 0;
+                vitima.hpEl.style.width = vitima.hp + '%';
+                
+                if (vitima.hp === 0) alert("Nocaute!");
+            }
+
+            setTimeout(() => atacante.el.classList.remove('atacando'), 200);
+        }
+
+        function atualizarPosicoes() {
+            p1.el.style.left = p1.x + 'px';
+            p2.el.style.left = p2.x + 'px';
+        }
+    </script>
 </body>
 </html>

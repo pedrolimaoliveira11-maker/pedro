@@ -1,134 +1,53 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Space Shooter - Estelar</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #000;
-            font-family: sans-serif;
-        }
+/* Barra de Vida */
+#hud {
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    color: #ff4757;
+    font-size: 18px;
+    z-index: 100;
+}
 
-        /* Fundo do Universo */
-        #game-container {
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
-            position: relative;
-            overflow: hidden;
-        }
+/* Estilo do Chefão */
+.boss {
+    width: 150px;
+    height: 80px;
+    background: linear-gradient(180deg, #8e44ad, #2c3e50);
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px 20px 50px 50px;
+    box-shadow: 0 0 30px #9b59b6;
+    transition: top 2s ease-out;
+}
 
-        /* Estrelas simples com CSS */
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.5;
-            animation: moveStars linear infinite;
-        }
+/* Olhos do Chefão */
+.boss::before, .boss::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 10px;
+    background: #00ff41;
+    top: 30px;
+    border-radius: 5px;
+    animation: blink 0.5s infinite;
+}
+.boss::before { left: 30px; }
+.boss::after { right: 30px; }
 
-        @keyframes moveStars {
-            from { transform: translateY(-10vh); }
-            to { transform: translateY(110vh); }
-        }
+@keyframes blink { 
+    50% { opacity: 0.3; } 
+}
 
-        /* Nave */
-        #player {
-            width: 50px;
-            height: 50px;
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(to top, #ff4757, #ff6b81);
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Formato triangular */
-            transition: left 0.1s linear;
-        }
-
-        /* Tiro */
-        .bullet {
-            width: 4px;
-            height: 15px;
-            background-color: #ffff00;
-            position: absolute;
-            border-radius: 2px;
-            box-shadow: 0 0 10px #fff700;
-        }
-    </style>
-</head>
-<body>
-
-<div id="game-container">
-    <div id="player"></div>
-</div>
-
-<script>
-    const container = document.getElementById('game-container');
-    const player = document.getElementById('player');
-    
-    let playerX = window.innerWidth / 2;
-    const playerSpeed = 20;
-
-    // Criar estrelas de fundo dinamicamente
-    function createStars() {
-        for (let i = 0; i < 100; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = Math.random() * 3 + 'px';
-            star.style.width = size;
-            star.style.height = size;
-            star.style.left = Math.random() * 100 + 'vw';
-            star.style.top = Math.random() * 100 + 'vh';
-            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            container.appendChild(star);
-        }
-    }
-
-    // Movimentação e Tiro
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft' || e.key === 'a') {
-            playerX -= playerSpeed;
-        } else if (e.key === 'ArrowRight' || e.key === 'd') {
-            playerX += playerSpeed;
-        } else if (e.key === ' ') {
-            fireBullet();
-        }
-
-        // Limites da tela
-        if (playerX < 25) playerX = 25;
-        if (playerX > window.innerWidth - 25) playerX = window.innerWidth - 25;
-
-        player.style.left = playerX + 'px';
-    });
-
-    // Lógica do Tiro
-    function fireBullet() {
-        const bullet = document.createElement('div');
-        bullet.className = 'bullet';
-        
-        // Posiciona o tiro na ponta da nave
-        bullet.style.left = (playerX - 2) + 'px';
-        bullet.style.bottom = '70px';
-        container.appendChild(bullet);
-
-        // Movimento do tiro para cima
-        let bulletPos = 70;
-        const moveBullet = setInterval(() => {
-            bulletPos += 10;
-            bullet.style.bottom = bulletPos + 'px';
-
-            // Remove o tiro se sair da tela
-            if (bulletPos > window.innerHeight) {
-                clearInterval(moveBullet);
-                bullet.remove();
-            }
-        }, 20);
-    }
-
-    createStars();
-</script>
-
-</body>
-</html>
+/* Tela de Game Over */
+#game-over {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    z-index: 1000;
+}

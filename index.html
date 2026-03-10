@@ -2,20 +2,20 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Rocket Defender - Universe</title>
+    <title>Rocket Defender - Final Edition</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; user-select: none; }
         #game-container { width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%); position: relative; overflow: hidden; }
 
-        /* HUD */
+        /* Interface */
         #ui { position: absolute; top: 20px; left: 20px; color: #00ff41; z-index: 100; pointer-events: none; }
-        .stat { font-size: 20px; text-shadow: 0 0 10px #00ff41; }
+        .stat { font-size: 20px; text-shadow: 0 0 10px #00ff41; margin-bottom: 5px; }
 
-        /* FOGUETE (SEU CÓDIGO) */
+        /* FOGUETE */
         #player {
             width: 30px; height: 60px; position: absolute; bottom: 30px; left: 50%;
             transform: translateX(-50%); background: #ecf0f1; border-radius: 50% 50% 10% 10%;
-            box-shadow: inset -5px 0 0 #bdc3c7; z-index: 10; transition: left 0.1s ease-out;
+            box-shadow: inset -5px 0 0 #bdc3c7; z-index: 10;
         }
         #player::before {
             content: ''; position: absolute; top: -15px; left: 0; width: 30px; height: 20px;
@@ -33,103 +33,11 @@
         }
         @keyframes flicker { from { height: 15px; opacity: 0.8; } to { height: 25px; opacity: 1; } }
 
+        /* FUMAÇA DO RASTRO */
+        .smoke {
+            position: absolute; width: 8px; height: 8px; background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%; pointer-events: none; z-index: 5;
+        }
+
         /* TIRO E INIMIGOS */
-        .bullet { width: 4px; height: 20px; background: #ffff00; position: absolute; box-shadow: 0 0 10px #ffff00; }
-        .alien { width: 40px; height: 30px; background: #00ff41; position: absolute; border-radius: 5px; box-shadow: -10px 10px 0 #00ff41, 10px 10px 0 #00ff41; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: fall linear infinite; }
-        @keyframes fall { from { transform: translateY(-10vh); } to { transform: translateY(110vh); } }
-        
-        #game-over { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; z-index: 1000; }
-        button { padding: 10px 20px; background: #00ff41; border: none; cursor: pointer; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-<div id="game-container">
-    <div id="ui">
-        <div class="stat">SCORE: <span id="score">0</span></div>
-        <div class="stat">LIVES: <span id="lives">3</span></div>
-    </div>
-    <div id="game-over">
-        <h1>FOGUETE DESTRUÍDO</h1>
-        <button onclick="location.reload()">REPARAR E VOLTAR</button>
-    </div>
-    <div id="player"><div class="thrust"></div></div>
-</div>
-
-<script>
-    const container = document.getElementById('game-container');
-    const player = document.getElementById('player');
-    let playerX = window.innerWidth / 2;
-    let score = 0, lives = 3, active = true;
-
-    // Movimentação
-    document.addEventListener('keydown', (e) => {
-        if (!active) return;
-        if (e.key === 'ArrowLeft' || e.key === 'a') playerX -= 25;
-        if (e.key === 'ArrowRight' || e.key === 'd') playerX += 25;
-        if (e.key === ' ') fire();
-        playerX = Math.max(25, Math.min(window.innerWidth - 25, playerX));
-        player.style.left = playerX + 'px';
-    });
-
-    function fire() {
-        const b = document.createElement('div');
-        b.className = 'bullet';
-        b.style.left = (playerX - 2) + 'px';
-        b.style.bottom = '90px'; // Sai da ponta do foguete
-        container.appendChild(b);
-
-        let pos = 90;
-        const move = setInterval(() => {
-            pos += 15; b.style.bottom = pos + 'px';
-            document.querySelectorAll('.alien').forEach(a => {
-                if(checkCol(b, a)) {
-                    a.remove(); b.remove(); clearInterval(move);
-                    score += 100; document.getElementById('score').innerText = score;
-                }
-            });
-            if (pos > window.innerHeight) { b.remove(); clearInterval(move); }
-        }, 20);
-    }
-
-    function spawn() {
-        if (!active) return;
-        const a = document.createElement('div');
-        a.className = 'alien';
-        a.style.left = Math.random() * (window.innerWidth - 40) + 'px';
-        a.style.top = '-40px';
-        container.appendChild(a);
-
-        let y = -40;
-        const move = setInterval(() => {
-            y += 4; a.style.top = y + 'px';
-            if (checkCol(a, player)) {
-                lives--; document.getElementById('lives').innerText = lives;
-                a.remove(); clearInterval(move);
-                if (lives <= 0) { active = false; document.getElementById('game-over').style.display = 'block'; }
-            }
-            if (y > window.innerHeight) { a.remove(); clearInterval(move); }
-        }, 30);
-    }
-
-    function checkCol(a, b) {
-        const r1 = a.getBoundingClientRect(), r2 = b.getBoundingClientRect();
-        return !(r1.top > r2.bottom || r1.bottom < r2.top || r1.right < r2.left || r1.left > r2.right);
-    }
-
-    // Estrelas de fundo
-    for(let i=0; i<50; i++){
-        const s = document.createElement('div');
-        s.className = 'star';
-        s.style.width = s.style.height = Math.random()*3+'px';
-        s.style.left = Math.random()*100+'vw';
-        s.style.top = Math.random()*100+'vh';
-        s.style.animationDuration = (Math.random()*3+2)+'s';
-        container.appendChild(s);
-    }
-
-    setInterval(spawn, 1000);
-</script>
-</body>
-</html>
+        .bullet { width: 4px; height: 20px; background: #ffff00;

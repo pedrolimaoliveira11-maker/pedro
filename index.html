@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rocket Shooter Auto</title>
+    <title>Rocket Defender: Ultimate Edition</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
         
         #game-container { 
             width: 100vw; height: 100vh; 
@@ -13,10 +13,19 @@
             position: relative; overflow: hidden; 
         }
 
+        /* Tremor de tela */
+        .shake { animation: shakeAnim 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shakeAnim {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+        }
+
         /* Interface (HUD) */
-        #ui { position: absolute; top: 20px; left: 20px; color: #00ff41; z-index: 100; pointer-events: none; }
-        .stat { font-size: 22px; text-shadow: 0 0 10px #00ff41; margin-bottom: 5px; }
+        #ui { position: absolute; top: 20px; left: 20px; color: #fff; z-index: 100; pointer-events: none; }
+        .stat { font-size: 22px; font-weight: bold; margin-bottom: 5px; text-shadow: 0 0 10px rgba(0,255,65,0.5); }
         #lives { color: #ff4757; }
+        #level-tag { color: #ffff00; font-size: 14px; }
 
         /* FOGUETE */
         #player {
@@ -24,11 +33,11 @@
             transform: translateX(-50%); background: #ecf0f1; border-radius: 50% 50% 10% 10%;
             box-shadow: inset -5px 0 0 #bdc3c7; z-index: 10;
         }
-        #player::before {
+        #player::before { /* Bico */
             content: ''; position: absolute; top: -15px; left: 0; width: 30px; height: 20px;
             background: #ff4757; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
-        #player::after {
+        #player::after { /* Asas */
             content: ''; position: absolute; bottom: -10px; left: -10px; width: 50px; height: 30px;
             background: linear-gradient(90deg, #ff4757 20%, transparent 20%, transparent 80%, #ff4757 80%);
             clip-path: polygon(0% 100%, 20% 0%, 80% 0%, 100% 100%); z-index: -1;
@@ -38,200 +47,47 @@
             width: 12px; height: 20px; background: linear-gradient(to bottom, #ff9f43, transparent);
             border-radius: 0 0 50% 50%; animation: flicker 0.1s infinite alternate;
         }
-        @keyframes flicker { from { height: 15px; opacity: 0.7; } to { height: 25px; opacity: 1; } }
+        @keyframes flicker { from { height: 15px; opacity: 0.8; } to { height: 25px; opacity: 1; } }
 
-        /* TIRO, ALIENS E BOSS */
+        /* ESCUDO */
+        #shield-visual {
+            display: none; position: absolute; width: 90px; height: 90px;
+            border: 3px solid #00d2ff; border-radius: 50%; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); box-shadow: 0 0 20px #00d2ff, inset 0 0 15px #00d2ff;
+            animation: shieldPulse 0.5s infinite alternate; pointer-events: none;
+        }
+        @keyframes shieldPulse { from { opacity: 0.3; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); } }
+
+        /* TIROS, INIMIGOS E ITENS */
         .bullet { width: 4px; height: 20px; background: #ffff00; position: absolute; box-shadow: 0 0 10px #ffff00; border-radius: 2px; }
         .alien { width: 40px; height: 30px; background: #00ff41; position: absolute; border-radius: 5px; box-shadow: -10px 10px 0 #00ff41, 10px 10px 0 #00ff41; }
-        .boss { width: 160px; height: 90px; background: #8e44ad; position: absolute; border-radius: 20px 20px 50% 50%; box-shadow: 0 0 30px #9b59b6; top: -100px; transition: top 2s ease; }
+        .boss { width: 160px; height: 90px; background: #8e44ad; position: absolute; border-radius: 20px 20px 60px 60px; box-shadow: 0 0 40px #9b59b6; z-index: 5; transition: top 2s ease; }
+        .power-up { width: 30px; height: 30px; background: #00d2ff; position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 0 15px #00d2ff; animation: spin 2s infinite linear; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: fall linear infinite; }
-        @keyframes fall { from { transform: translateY(-10vh); } to { transform: translateY(110vh); } }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.4; animation: starFall linear infinite; }
+        @keyframes starFall { from { transform: translateY(-10vh); } to { transform: translateY(110vh); } }
 
-        .particle { position: absolute; width: 4px; height: 4px; background: #fffa00; border-radius: 50%; pointer-events: none; }
+        .particle { position: absolute; width: 4px; height: 4px; background: #ffca28; border-radius: 50%; pointer-events: none; }
 
         /* TELAS */
-        #game-over { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; z-index: 1000; }
-        button { padding: 12px 25px; background: #00ff41; border: none; cursor: pointer; font-family: inherit; font-weight: bold; font-size: 18px; margin-top: 15px; }
+        #msg-overlay { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); color: #ffff00; font-size: 32px; font-weight: bold; pointer-events: none; text-shadow: 0 0 15px #000; z-index: 200; opacity: 0; }
+        .fade-in-out { animation: fadeInOut 2s forwards; }
+        @keyframes fadeInOut { 0% { opacity:0; transform: translate(-50%, 0%); } 20% { opacity:1; } 80% { opacity:1; } 100% { opacity:0; transform: translate(-50%, -100%); } }
+
+        #game-over { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; z-index: 1000; background: rgba(0,0,0,0.8); padding: 40px; border-radius: 20px; border: 2px solid #ff4757; }
+        button { padding: 15px 30px; background: #00ff41; border: none; cursor: pointer; font-size: 18px; font-weight: bold; border-radius: 5px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div id="ui">
-        <div class="stat">PONTOS: <span id="score">0</span></div>
-        <div class="stat">VIDAS: <span id="lives">3</span></div>
+        <div class="stat">SCORE: <span id="score-val">0</span></div>
+        <div class="stat">LIVES: <span id="lives-val">3</span></div>
+        <div id="level-tag">LEVEL 1: TIRO SIMPLES</div>
     </div>
 
-    <div id="game-over">
-        <h1>MISSAO ABORTADA</h1>
-        <p>O foguete foi destruído!</p>
-        <button onclick="location.reload()">REPARAR FOGUETE</button>
-    </div>
+    <div id="msg-overlay"></div>
 
-    <div id="player"><div class="thrust"></div></div>
-</div>
-
-<script>
-    const container = document.getElementById('game-container');
-    const player = document.getElementById('player');
-    const scoreEl = document.getElementById('score');
-    const livesEl = document.getElementById('lives');
-
-    let playerX = window.innerWidth / 2;
-    let score = 0, lives = 3, gameActive = true, bossActive = false;
-
-    // 1. MOVIMENTAÇÃO (Mouse ou Teclado)
-    document.addEventListener('mousemove', (e) => {
-        if (!gameActive) return;
-        playerX = e.clientX;
-        updatePlayerPos();
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (!gameActive) return;
-        if (e.key === 'ArrowLeft' || e.key === 'a') playerX -= 35;
-        if (e.key === 'ArrowRight' || e.key === 'd') playerX += 35;
-        updatePlayerPos();
-    });
-
-    function updatePlayerPos() {
-        playerX = Math.max(25, Math.min(window.innerWidth - 25, playerX));
-        player.style.left = playerX + 'px';
-    }
-
-    // 2. TIRO AUTOMÁTICO
-    setInterval(() => {
-        if (gameActive) fire();
-    }, 200); // Dispara a cada 0.2 segundos
-
-    function fire() {
-        const b = document.createElement('div');
-        b.className = 'bullet';
-        b.style.left = (playerX - 2) + 'px';
-        b.style.bottom = '90px'; // Sai do bico do foguete
-        container.appendChild(b);
-
-        let pos = 90;
-        const moveB = setInterval(() => {
-            pos += 12;
-            b.style.bottom = pos + 'px';
-
-            const targets = document.querySelectorAll('.alien, .boss');
-            targets.forEach(t => {
-                if (checkCol(b, t)) {
-                    if (t.classList.contains('boss')) {
-                        t.hp--;
-                        createExplosion(b.offsetLeft, t.offsetTop + t.offsetHeight);
-                        b.remove(); clearInterval(moveB);
-                        if (t.hp <= 0) { destroy(t, 5000); bossActive = false; }
-                    } else {
-                        destroy(t, 100);
-                        b.remove(); clearInterval(moveB);
-                    }
-                }
-            });
-
-            if (pos > window.innerHeight) { b.remove(); clearInterval(moveB); }
-        }, 20);
-    }
-
-    // 3. INIMIGOS E BOSS
-    function spawn() {
-        if (!gameActive) return;
-
-        if (score >= 2000 && !bossActive) {
-            spawnBoss();
-            return;
-        }
-
-        if (bossActive) return;
-
-        const a = document.createElement('div');
-        a.className = 'alien';
-        a.style.left = Math.random() * (window.innerWidth - 50) + 'px';
-        a.style.top = '-50px';
-        container.appendChild(a);
-
-        let y = -50;
-        const moveA = setInterval(() => {
-            if (!gameActive) { clearInterval(moveA); return; }
-            y += 4;
-            a.style.top = y + 'px';
-
-            if (checkCol(a, player)) {
-                takeDamage();
-                a.remove(); clearInterval(moveA);
-            }
-            if (y > window.innerHeight) { a.remove(); clearInterval(moveA); }
-        }, 30);
-    }
-
-    function spawnBoss() {
-        bossActive = true;
-        const boss = document.createElement('div');
-        boss.className = 'boss';
-        boss.hp = 40; 
-        boss.style.left = '50%';
-        boss.style.transform = 'translateX(-50%)';
-        container.appendChild(boss);
-        setTimeout(() => { boss.style.top = '70px'; }, 100);
-    }
-
-    // 4. SISTEMA DE DANO E COLISÃO
-    function destroy(target, pts) {
-        const r = target.getBoundingClientRect();
-        createExplosion(r.left + r.width/2, r.top + r.height/2);
-        score += pts;
-        scoreEl.innerText = score;
-        target.remove();
-    }
-
-    function takeDamage() {
-        lives--;
-        livesEl.innerText = lives;
-        player.style.filter = "brightness(5) sepia(1) hue-rotate(-50deg)";
-        setTimeout(() => player.style.filter = "none", 200);
-        if (lives <= 0) {
-            gameActive = false;
-            document.getElementById('game-over').style.display = 'block';
-        }
-    }
-
-    function checkCol(a, b) {
-        const r1 = a.getBoundingClientRect(), r2 = b.getBoundingClientRect();
-        return !(r1.top > r2.bottom || r1.bottom < r2.top || r1.right < r2.left || r1.left > r2.right);
-    }
-
-    function createExplosion(x, y) {
-        for(let i=0; i<8; i++){
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = x+'px'; p.style.top = y+'px';
-            container.appendChild(p);
-            const ang = Math.random()*Math.PI*2, spd = Math.random()*5+2;
-            let px=x, py=y, op=1;
-            const m = setInterval(() => {
-                px+=Math.cos(ang)*spd; py+=Math.sin(ang)*spd; op-=0.05;
-                p.style.left=px+'px'; p.style.top=py+'px'; p.style.opacity=op;
-                if(op<=0){ clearInterval(m); p.remove(); }
-            }, 20);
-        }
-    }
-
-    // 5. ESTRELAS
-    for(let i=0; i<60; i++){
-        const s = document.createElement('div');
-        s.className = 'star';
-        const sz = Math.random()*3+'px';
-        s.style.width = sz; s.style.height = sz;
-        s.style.left = Math.random()*100+'vw';
-        s.style.top = Math.random()*100+'vh';
-        s.style.animationDuration = (Math.random()*2+2)+'s';
-        container.appendChild(s);
-    }
-
-    setInterval(spawn, 1000);
-</script>
-</body>
-</html>
+    <div id="game-over

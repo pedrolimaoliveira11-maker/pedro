@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rocket Defender: Evolution War</title>
+    <title>Rocket Defender: Extreme Edition</title>
     <style>
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; user-select: none; }
         #game-container { width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%); position: relative; overflow: hidden; }
-        
+
+        /* Tremor de tela */
         .shake { animation: shakeAnim 0.3s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shakeAnim {
             10%, 90% { transform: translate3d(-2px, 0, 0); }
@@ -15,29 +16,272 @@
             30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
         }
 
+        /* HUD */
         #ui { position: absolute; top: 20px; left: 20px; color: #fff; z-index: 100; pointer-events: none; }
         .stat { font-size: 22px; font-weight: bold; text-shadow: 0 0 10px #00ff41; margin-bottom: 5px; }
-        #level-msg { color: #ffff00; font-size: 16px; font-weight: bold; }
+        #level-msg { color: #ffff00; font-size: 16px; }
 
         /* FOGUETE */
         #player {
             width: 30px; height: 60px; position: absolute; bottom: 30px; left: 50%;
             transform: translateX(-50%); background: #ecf0f1; border-radius: 50% 50% 10% 10%;
-            box-shadow: inset -5px 0 0 #bdc3c7; z-index: 10;
+            box-shadow: inset -5px 0 0 #bdc3c7; z-index: 10; transition: left 0.1s ease-out;
         }
         #player::before { content: ''; position: absolute; top: -15px; left: 0; width: 30px; height: 20px; background: #ff4757; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
         #player::after { content: ''; position: absolute; bottom: -10px; left: -10px; width: 50px; height: 30px; background: linear-gradient(90deg, #ff4757 20%, transparent 20%, transparent 80%, #ff4757 80%); clip-path: polygon(0% 100%, 20% 0%, 80% 0%, 100% 100%); z-index: -1; }
         .thrust { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); width: 12px; height: 20px; background: linear-gradient(to bottom, #ff9f43, transparent); border-radius: 0 0 50% 50%; animation: flicker 0.1s infinite alternate; }
-        @keyframes flicker { from { height: 15px; opacity: 0.8; } to { height: 25px; opacity: 1; } }
+        @keyframes flicker { from { height: 15px; } to { height: 25px; } }
 
-        /* TIROS */
+        /* ESCUDO */
+        #shield-visual { display: none; position: absolute; width: 90px; height: 90px; border: 3px solid #00d2ff; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 20px #00d2ff, inset 0 0 15px #00d2ff; animation: pulse 0.5s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.3; scale: 0.9; } to { opacity: 0.7; scale: 1.1; } }
+
+        /* TIROS E INIMIGOS */
         .bullet { width: 4px; height: 20px; background: #ffff00; position: absolute; border-radius: 2px; box-shadow: 0 0 10px #ffff00; }
-        .alien-bullet { width: 6px; height: 15px; background: #ff00ff; position: absolute; border-radius: 50% 50% 0 0; box-shadow: 0 0 10px #ff00ff; }
-
-        /* INIMIGOS */
+        .alien-bullet { width: 6px; height: 15px; background: #ff00ff; position: absolute; border-radius: 3px; box-shadow: 0 0 10px #ff00ff; }
         .alien { width: 40px; height: 30px; background: #00ff41; position: absolute; border-radius: 5px; box-shadow: -10px 10px 0 #00ff41, 10px 10px 0 #00ff41; }
-        .boss { width: 180px; height: 100px; background: linear-gradient(180deg, #4b0082, #000); position: absolute; border-radius: 20px 20px 80px 80px; box-shadow: 0 0 50px #ff00ff; z-index: 5; border: 2px solid #ff00ff; transition: top 2s ease; }
+        .boss { width: 160px; height: 90px; background: linear-gradient(180deg, #4b0082, #000); position: absolute; border-radius: 20px 20px 80px 80px; box-shadow: 0 0 50px #ff00ff; z-index: 5; border: 2px solid #ff00ff; }
+        .boss::before, .boss::after { content: ''; position: absolute; width: 25px; height: 8px; background: #ff0000; top: 35px; border-radius: 50%; box-shadow: 0 0 15px #ff0000; }
+        .boss::before { left: 35px; transform: rotate(-10deg); } .boss::after { right: 35px; transform: rotate(10deg); }
 
-        /* OUTROS */
-        #shield-visual { display: none; position: absolute; width: 90px; height: 90px; border: 3px solid #00d2ff; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 20px #00d2ff; animation: pulse 0.5s infinite alternate; }
-        @keyframes pulse { from
+        /* EFEITOS */
+        .power-up { width: 30px; height: 30px; background: #00d2ff; position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; animation: spin 2s infinite linear; box-shadow: 0 0 15px #00d2ff; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .trail { position: absolute; width: 8px; height: 8px; background: rgba(255,255,255,0.2); border-radius: 50%; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.4; animation: starFall linear infinite; }
+        @keyframes starFall { from { transform: translateY(-10vh); } to { transform: translateY(110vh); } }
+        .particle { position: absolute; width: 4px; height: 4px; background: #ffca28; border-radius: 50%; pointer-events: none; }
+
+        /* TELAS */
+        #game-over { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; z-index: 1000; background: rgba(0,0,0,0.9); padding: 40px; border: 2px solid #ff4757; border-radius: 20px; }
+        button { padding: 15px 30px; background: #00ff41; border: none; cursor: pointer; font-family: inherit; font-weight: bold; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="ui">
+        <div class="stat">PONTOS: <span id="score">0</span></div>
+        <div class="stat">VIDAS: <span id="lives">3</span></div>
+        <div id="level-msg">NÍVEL 1: INÍCIO</div>
+    </div>
+
+    <div id="game-over">
+        <h1>FOGUETE DESTRUÍDO</h1>
+        <button onclick="location.reload()">REPARAR E VOLTAR</button>
+    </div>
+
+    <div id="player">
+        <div class="thrust"></div>
+        <div id="shield-visual"></div>
+    </div>
+</div>
+
+<script>
+    const container = document.getElementById('game-container');
+    const player = document.getElementById('player');
+    const shieldVis = document.getElementById('shield-visual');
+    let playerX = window.innerWidth / 2;
+    let score = 0, lives = 3, level = 1, active = true, isShielded = false, bossActive = false;
+
+    // --- MOVIMENTAÇÃO ---
+    document.addEventListener('keydown', (e) => {
+        if (!active) return;
+        if (e.key === 'ArrowLeft' || e.key === 'a') playerX -= 35;
+        if (e.key === 'ArrowRight' || e.key === 'd') playerX += 35;
+        playerX = Math.max(30, Math.min(window.innerWidth - 30, playerX));
+        player.style.left = playerX + 'px';
+    });
+
+    // --- RASTRO ---
+    setInterval(() => {
+        if (!active) return;
+        const t = document.createElement('div');
+        t.className = 'trail';
+        t.style.left = playerX + (Math.random()*10 - 5) + 'px';
+        t.style.top = (window.innerHeight - 40) + 'px';
+        container.appendChild(t);
+        let op = 0.3;
+        const m = setInterval(() => {
+            op -= 0.02; t.style.opacity = op;
+            if(op <= 0) { clearInterval(m); t.remove(); }
+        }, 30);
+    }, 50);
+
+    // --- TIRO JOGADOR ---
+    setInterval(() => {
+        if (!active) return;
+        if (level === 1) createBullet(0);
+        else if (level === 2) { createBullet(-15); createBullet(15); }
+        else { createBullet(-20); createBullet(0, true); createBullet(20); }
+    }, 200);
+
+    function createBullet(offset, special = false) {
+        const b = document.createElement('div');
+        b.className = 'bullet';
+        if (special) { b.style.background = '#00d2ff'; b.style.width = '6px'; b.style.boxShadow = '0 0 15px #00d2ff'; }
+        b.style.left = (playerX + offset - 2) + 'px';
+        b.style.bottom = '90px';
+        container.appendChild(b);
+        let pos = 90;
+        const move = setInterval(() => {
+            pos += 22; b.style.bottom = pos + 'px';
+            document.querySelectorAll('.alien, .boss').forEach(t => {
+                if (checkCol(b, t)) {
+                    if (t.classList.contains('boss')) {
+                        t.hp--; t.style.filter = "brightness(2)"; setTimeout(() => t.style.filter = "none", 50);
+                        if (t.hp <= 0) { destroy(t, 5000); bossActive = false; triggerShake(); }
+                    } else { destroy(t, 100); }
+                    b.remove(); clearInterval(move);
+                }
+            });
+            if (pos > window.innerHeight) { b.remove(); clearInterval(move); }
+        }, 16);
+    }
+
+    // --- TIRO INIMIGO ---
+    function alienFire(alien) {
+        if(!active || !alien.parentElement) return;
+        const ab = document.createElement('div');
+        ab.className = 'alien-bullet';
+        const rect = alien.getBoundingClientRect();
+        ab.style.left = (rect.left + rect.width/2 - 3) + 'px';
+        ab.style.top = rect.bottom + 'px';
+        container.appendChild(ab);
+        let y = rect.bottom;
+        const move = setInterval(() => {
+            y += 8; ab.style.top = y + 'px';
+            if (checkCol(ab, player)) { takeDamage(); ab.remove(); clearInterval(move); }
+            if (y > window.innerHeight || !active) { ab.remove(); clearInterval(move); }
+        }, 20);
+    }
+
+    // --- SPAWNS ---
+    function spawnAlien() {
+        if (!active || bossActive) return;
+        const a = document.createElement('div');
+        a.className = 'alien';
+        a.style.left = Math.random() * (window.innerWidth - 40) + 'px';
+        a.style.top = '-40px';
+        container.appendChild(a);
+
+        const fireClock = setInterval(() => {
+            if (Math.random() < 0.3) alienFire(a);
+            if (!a.parentElement) clearInterval(fireClock);
+        }, 2000);
+
+        let y = -40;
+        const move = setInterval(() => {
+            y += 3; a.style.top = y + 'px';
+            if (checkCol(a, player)) { takeDamage(); a.remove(); clearInterval(move); }
+            if (y > window.innerHeight || !a.parentElement) { a.remove(); clearInterval(move); }
+        }, 30);
+    }
+
+    function spawnBoss() {
+        bossActive = true;
+        const b = document.createElement('div');
+        b.className = 'boss'; b.hp = 60;
+        b.style.left = '50%'; b.style.transform = 'translateX(-50%)'; b.style.top = '-100px';
+        container.appendChild(b);
+        setTimeout(() => b.style.top = '60px', 100);
+        const bossClock = setInterval(() => {
+            if(bossActive && active) { createBulletBoss(b); }
+            else clearInterval(bossClock);
+        }, 1000);
+    }
+
+    function createBulletBoss(b) {
+        const rect = b.getBoundingClientRect();
+        for(let i=0; i<3; i++) {
+            const ab = document.createElement('div');
+            ab.className = 'alien-bullet';
+            ab.style.left = (rect.left + (rect.width/4)*(i+1)) + 'px';
+            ab.style.top = rect.bottom + 'px';
+            container.appendChild(ab);
+            let y = rect.bottom;
+            const m = setInterval(() => {
+                y += 10; ab.style.top = y + 'px';
+                if(checkCol(ab, player)) { takeDamage(); ab.remove(); clearInterval(m); }
+                if(y > window.innerHeight) { ab.remove(); clearInterval(m); }
+            }, 20);
+        }
+    }
+
+    // --- UTILITÁRIOS ---
+    function destroy(target, pts) {
+        const r = target.getBoundingClientRect();
+        explode(r.left + r.width/2, r.top + r.height/2);
+        score += pts;
+        document.getElementById('score').innerText = score;
+        target.remove();
+        checkLevel();
+    }
+
+    function checkLevel() {
+        let m = document.getElementById('level-msg');
+        if (score >= 2000 && level === 1) { level = 2; m.innerText = "NÍVEL 2: TIRO DUPLO"; }
+        if (score >= 5000 && level === 2) { level = 3; m.innerText = "NÍVEL 3: TIRO TRIPLO"; }
+        if (score >= 8000 && !bossActive) spawnBoss();
+    }
+
+    function takeDamage() {
+        if (isShielded) return;
+        lives--; document.getElementById('lives').innerText = lives;
+        triggerShake();
+        player.style.filter = "brightness(5)"; setTimeout(() => player.style.filter = "none", 200);
+        if (lives <= 0) { active = false; document.getElementById('game-over').style.display = 'block'; }
+    }
+
+    function triggerShake() { container.classList.add('shake'); setTimeout(() => container.classList.remove('shake'), 300); }
+
+    function activateShield() {
+        isShielded = true; shieldVis.style.display = 'block';
+        setTimeout(() => { isShielded = false; shieldVis.style.display = 'none'; }, 5000);
+    }
+
+    function spawnPowerUp() {
+        if (!active) return;
+        const p = document.createElement('div'); p.className = 'power-up'; p.innerText = 'S';
+        p.style.left = Math.random() * (window.innerWidth - 30) + 'px'; p.style.top = '-30px';
+        container.appendChild(p);
+        let y = -30;
+        const m = setInterval(() => {
+            y += 3; p.style.top = y + 'px';
+            if (checkCol(p, player)) { activateShield(); p.remove(); clearInterval(m); }
+            if (y > window.innerHeight) { p.remove(); clearInterval(m); }
+        }, 30);
+    }
+
+    function checkCol(a, b) {
+        const r1 = a.getBoundingClientRect(), r2 = b.getBoundingClientRect();
+        return !(r1.top > r2.bottom || r1.bottom < r2.top || r1.right < r2.left || r1.left > r2.right);
+    }
+
+    function explode(x, y) {
+        for(let i=0; i<12; i++) {
+            const p = document.createElement('div'); p.className = 'particle';
+            p.style.left = x+'px'; p.style.top = y+'px'; container.appendChild(p);
+            const ang = Math.random()*Math.PI*2, vel = Math.random()*6+2;
+            let px=x, py=y, op=1;
+            const move = setInterval(() => {
+                px+=Math.cos(ang)*vel; py+=Math.sin(ang)*vel; op-=0.05;
+                p.style.left=px+'px'; p.style.top=py+'px'; p.style.opacity=op;
+                if(op<=0){ p.remove(); clearInterval(move); }
+            }, 20);
+        }
+    }
+
+    // Estrelas
+    for(let i=0; i<80; i++) {
+        const s = document.createElement('div'); s.className = 'star';
+        const sz = Math.random()*3; s.style.width = s.style.height = sz+'px';
+        s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*100+'vh';
+        s.style.animationDuration = (5-sz)+'s'; container.appendChild(s);
+    }
+
+    setInterval(spawnAlien, 1200);
+    setInterval(spawnPowerUp, 15000);
+</script>
+</body>
+</html>

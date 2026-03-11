@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warship Defender: Global Conflict</title>
+    <title>Warship Defender: Golden Edition</title>
     <style>
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; user-select: none; }
         #game-container { width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%); position: relative; overflow: hidden; }
@@ -20,23 +20,31 @@
         #ui { position: absolute; top: 20px; left: 20px; color: #fff; z-index: 100; pointer-events: none; }
         .stat { font-size: 22px; font-weight: bold; text-shadow: 0 0 10px #00ff41; margin-bottom: 5px; }
 
-        /* NAVE DE GUERRA (PLAYER) */
+        /* NAVE DE GUERRA */
         #player {
             width: 60px; height: 80px; position: absolute; bottom: 30px; left: 50%;
             transform: translateX(-50%); background: #535c68; border-radius: 10px;
             box-shadow: 0 0 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,255,255,0.2);
-            z-index: 10; border: 2px solid #3d464d; transition: left 0.1s ease-out;
+            z-index: 10; border: 2px solid #3d464d; transition: left 0.1s ease-out, background 0.5s;
         }
-        #player::before { /* Cabine/Cockpit */
+        /* Versão Dourada */
+        #player.gold { background: #ffd700; box-shadow: 0 0 30px #ffd700; border-color: #b8860b; }
+        
+        #player::before { /* Cabine */
             content: ''; position: absolute; top: -15px; left: 15px; width: 30px; height: 30px;
             background: #747d8c; border-radius: 5px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); border: 2px solid #3d464d;
         }
-        #player::after { /* Asas Angulares */
+        #player.gold::before { background: #fff700; border-color: #b8860b; }
+
+        #player::after { /* Asas */
             content: ''; position: absolute; bottom: 0; left: -20px; width: 100px; height: 40px;
             background: #4a5159; border-radius: 5px; clip-path: polygon(0% 100%, 15% 0%, 85% 0%, 100% 100%); border: 2px solid #3d464d; z-index: -1;
         }
+        #player.gold::after { background: #daa520; border-color: #b8860b; }
+
         .cannon { position: absolute; width: 8px; height: 25px; background: #3d464d; border: 1px solid #2c3136; border-radius: 2px; top: 40px; z-index: 11; }
         .cannon.left { left: -5px; } .cannon.right { right: -5px; }
+        #player.gold .cannon { background: #b8860b; }
 
         .thrust { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); width: 20px; height: 25px; background: linear-gradient(to bottom, #ff9f43, transparent); border-radius: 0 0 50% 50%; animation: flicker 0.1s infinite alternate; }
         @keyframes flicker { from { height: 15px; } to { height: 30px; } }
@@ -48,10 +56,10 @@
         /* TIROS E INIMIGOS */
         .bullet { width: 5px; height: 20px; background: #ffff00; position: absolute; box-shadow: 0 0 10px #ffff00; border-radius: 2px; }
         .alien-bullet { width: 6px; height: 15px; background: #ff00ff; position: absolute; border-radius: 3px; box-shadow: 0 0 10px #ff00ff; }
-        .alien { width: 40px; height: 35px; background: #00ff41; position: absolute; border-radius: 5px; border: 2px solid #00441b; }
+        .alien { width: 45px; height: 35px; background: #00ff41; position: absolute; border-radius: 5px; border: 2px solid #00441b; }
         .boss { width: 200px; height: 100px; background: linear-gradient(180deg, #4b0082, #000); position: absolute; border-radius: 20px 20px 80px 80px; box-shadow: 0 0 50px #ff00ff; z-index: 5; border: 3px solid #ff00ff; }
 
-        /* EFEITOS AMBIENTAIS */
+        /* EFEITOS */
         .power-up { width: 30px; height: 30px; background: #00d2ff; position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; animation: spin 2s infinite linear; box-shadow: 0 0 15px #00d2ff; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .trail { position: absolute; width: 10px; height: 10px; background: rgba(255,255,255,0.2); border-radius: 50%; pointer-events: none; }
@@ -67,14 +75,14 @@
 
 <div id="game-container">
     <div id="ui">
-        <div class="stat">PONTOS: <span id="score">0</span></div>
+        <div class="stat">SCORE: <span id="score">0</span></div>
         <div class="stat">VIDAS: <span id="lives">3</span></div>
-        <div id="level-msg" style="color: #ffff00;">PATRULHA INICIAL</div>
+        <div id="level-msg" style="color: #ffff00;">NÍVEL 1: PATRULHA</div>
     </div>
 
     <div id="game-over">
-        <h1>NAVE DE GUERRA ABATIDA</h1>
-        <button onclick="location.reload()">REIMPLANTAR NAVE</button>
+        <h1>MISSIÃO ABORTADA</h1>
+        <button onclick="location.reload()">RECOMECAR</button>
     </div>
 
     <div id="player">
@@ -92,7 +100,7 @@
     let playerX = window.innerWidth / 2;
     let score = 0, lives = 3, level = 1, active = true, isShielded = false, bossActive = false;
 
-    // --- CONTROLE DE MOVIMENTO ---
+    // CONTROLES
     document.addEventListener('keydown', (e) => {
         if (!active) return;
         if (e.key === 'ArrowLeft' || e.key === 'a') playerX -= 40;
@@ -101,7 +109,7 @@
         player.style.left = playerX + 'px';
     });
 
-    // --- RASTRO DE FUMAÇA ---
+    // RASTRO
     setInterval(() => {
         if (!active) return;
         const t = document.createElement('div');
@@ -116,12 +124,12 @@
         }, 30);
     }, 60);
 
-    // --- SISTEMA DE TIRO (NAVE DE GUERRA) ---
+    // TIRO
     setInterval(() => {
         if (!active) return;
         if (level === 1) createBullet(0);
-        else if (level === 2) { createBullet(-25); createBullet(25); } // Canhões laterais
-        else { createBullet(-25); createBullet(0, true); createBullet(25); } // Canhões + Central
+        else if (level === 2) { createBullet(-25); createBullet(25); }
+        else { createBullet(-25); createBullet(0, true); createBullet(25); }
     }, 180);
 
     function createBullet(offset, special = false) {
@@ -139,17 +147,15 @@
                     if (t.classList.contains('boss')) {
                         t.hp--; t.style.filter = "brightness(2)"; setTimeout(() => t.style.filter = "none", 50);
                         if (t.hp <= 0) { explode(t); score += 5000; t.remove(); bossActive = false; triggerShake(); }
-                    } else { 
-                        explode(t); score += 100; t.remove(); 
-                    }
-                    b.remove(); clearInterval(move); updateUI();
+                    } else { explode(t); score += 100; t.remove(); }
+                    b.remove(); clearInterval(move); updateProgress();
                 }
             });
             if (pos > window.innerHeight) { b.remove(); clearInterval(move); }
         }, 16);
     }
 
-    // --- TIRO DOS INIMIGOS ---
+    // TIRO INIMIGO
     function alienFire(alien) {
         if(!active || !alien.parentElement) return;
         const ab = document.createElement('div');
@@ -166,7 +172,7 @@
         }, 20);
     }
 
-    // --- SPAWNS ---
+    // SPAWNS
     function spawnAlien() {
         if (!active || bossActive) return;
         const a = document.createElement('div');
@@ -174,12 +180,10 @@
         a.style.left = Math.random() * (window.innerWidth - 60) + 'px';
         a.style.top = '-50px';
         container.appendChild(a);
-
         const fireClock = setInterval(() => {
-            if (Math.random() < 0.35) alienFire(a);
+            if (Math.random() < 0.3) alienFire(a);
             if (!a.parentElement) clearInterval(fireClock);
         }, 1800);
-
         let y = -50;
         const move = setInterval(() => {
             y += 3.5; a.style.top = y + 'px';
@@ -214,12 +218,19 @@
         }, 1200);
     }
 
-    // --- LÓGICA DE JOGO ---
-    function updateUI() {
+    // LOGICA
+    function updateProgress() {
         document.getElementById('score').innerText = score;
         let m = document.getElementById('level-msg');
-        if (score >= 2500 && level === 1) { level = 2; m.innerText = "NÍVEL 2: CANHÕES ATIVADOS"; }
-        if (score >= 6000 && level === 2) { level = 3; m.innerText = "NÍVEL 3: MODO GUERRA TOTAL"; }
+        if (score >= 2500 && level === 1) { 
+            level = 2; 
+            m.innerText = "NÍVEL 2: CANHÕES LATERAIS"; 
+        }
+        if (score >= 6000 && level === 2) { 
+            level = 3; 
+            m.innerText = "NÍVEL 3: MODO GUERRA DOURADA"; 
+            player.classList.add('gold'); // Evolução visual!
+        }
         if (score >= 10000 && !bossActive) spawnBoss();
     }
 

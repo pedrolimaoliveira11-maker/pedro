@@ -3,52 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warship Defender: Mouse Control Edition</title>
+    <title>Warship Defender: Alien Invasion</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; user-select: none; cursor: none; /* Esconde o mouse no jogo */ }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; user-select: none; cursor: none; }
         #game-container { width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%); position: relative; overflow: hidden; transition: filter 0.5s; }
         
+        /* Câmera Lenta */
         .slow-mo { filter: sepia(0.5) hue-rotate(180deg) brightness(1.2); }
 
-        .shake { animation: shakeAnim 0.3s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shakeAnim {
-            10%, 90% { transform: translate3d(-2px, 0, 0); }
-            20%, 80% { transform: translate3d(4px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-        }
-
+        /* HUD */
         #ui { position: absolute; top: 20px; left: 20px; color: #fff; z-index: 100; pointer-events: none; }
         .stat { font-size: 22px; font-weight: bold; text-shadow: 0 0 10px #00ff41; margin-bottom: 5px; }
 
-        /* NAVE DE GUERRA */
+        /* NAVE DE GUERRA (PLAYER) */
         #player {
             width: 60px; height: 80px; position: absolute; bottom: 30px; left: 50%;
             transform: translateX(-50%); background: #535c68; border-radius: 10px;
             box-shadow: 0 0 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,255,255,0.2);
-            z-index: 10; border: 2px solid #3d464d; pointer-events: none; /* Evita que a nave bloqueie o mouse */
+            z-index: 10; border: 2px solid #3d464d; pointer-events: none;
         }
         #player.gold { background: #ffd700; box-shadow: 0 0 30px #ffd700; border-color: #b8860b; }
         #player::before { content: ''; position: absolute; top: -15px; left: 15px; width: 30px; height: 30px; background: #747d8c; border-radius: 5px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); border: 2px solid #3d464d; }
-        #player.gold::before { background: #fff700; }
         #player::after { content: ''; position: absolute; bottom: 0; left: -20px; width: 100px; height: 40px; background: #4a5159; border-radius: 5px; clip-path: polygon(0% 100%, 15% 0%, 85% 0%, 100% 100%); border: 2px solid #3d464d; z-index: -1; }
-        #player.gold::after { background: #daa520; }
-        .cannon { position: absolute; width: 8px; height: 25px; background: #3d464d; border: 1px solid #2c3136; border-radius: 2px; top: 40px; }
+        .cannon { position: absolute; width: 8px; height: 25px; background: #3d464d; border-radius: 2px; top: 40px; }
         .cannon.left { left: -5px; } .cannon.right { right: -5px; }
-        .thrust { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); width: 20px; height: 25px; background: linear-gradient(to bottom, #ff9f43, transparent); border-radius: 0 0 50% 50%; animation: flicker 0.1s infinite alternate; }
-        @keyframes flicker { from { height: 15px; } to { height: 30px; } }
 
-        /* ENTIDADES */
-        .meteor { position: absolute; background: #5d4037; border-radius: 30% 70% 50% 50% / 50% 30% 70% 50%; box-shadow: inset -10px -10px 0 rgba(0,0,0,0.3); z-index: 4; }
-        .bullet { width: 5px; height: 20px; background: #ffff00; position: absolute; box-shadow: 0 0 10px #ffff00; border-radius: 2px; }
-        .alien-bullet { width: 6px; height: 15px; background: #ff00ff; position: absolute; border-radius: 3px; box-shadow: 0 0 10px #ff00ff; }
-        .alien { width: 45px; height: 35px; background: #00ff41; position: absolute; border-radius: 5px; border: 2px solid #00441b; }
-        .boss { width: 200px; height: 100px; background: linear-gradient(180deg, #4b0082, #000); position: absolute; border-radius: 20px 20px 80px 80px; box-shadow: 0 0 50px #ff00ff; z-index: 5; border: 3px solid #ff00ff; }
-        
-        .power-up { width: 35px; height: 35px; position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; box-shadow: 0 0 15px currentColor; animation: rot 2s infinite linear; }
-        @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        /* INIMIGO ALIENÍGENA */
+        .alien { 
+            width: 50px; height: 40px; position: absolute; 
+            background: #2ecc71; /* Verde alien */
+            clip-path: polygon(20% 0%, 80% 0%, 100% 40%, 80% 100%, 20% 100%, 0% 40%);
+            box-shadow: inset 0 0 10px #000;
+            z-index: 5;
+        }
+        /* Olhos do Alien */
+        .alien::before, .alien::after {
+            content: ''; position: absolute; top: 10px; width: 10px; height: 12px;
+            background: #000; border-radius: 50%;
+        }
+        .alien::before { left: 10px; transform: rotate(-20deg); }
+        .alien::after { right: 10px; transform: rotate(20deg); }
 
-        #game-over { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; z-index: 1000; background: rgba(0,0,0,0.9); padding: 50px; border: 3px solid #ff4757; border-radius: 20px; cursor: default; }
-        button { padding: 15px 30px; background: #00ff41; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 20px; font-family: inherit; }
+        /* TIROS */
+        .bullet { width: 5px; height: 20px; background: #ffff00; position: absolute; box-shadow: 0 0 10px #ffff00; }
+        .alien-laser { width: 4px; height: 15px; background: #e74c3c; position: absolute; box-shadow: 0 0 10px #e74c3c; border-radius: 2px; }
+
+        /* METEORO */
+        .meteor { position: absolute; background: #5d4037; border-radius: 50% 20% 50% 30%; box-shadow: inset -5px -5px 0 rgba(0,0,0,0.4); }
+
+        #game-over { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; z-index: 1000; background: rgba(0,0,0,0.9); padding: 50px; border: 3px solid #ff4757; border-radius: 20px; }
+        button { padding: 15px 30px; background: #2ecc71; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -57,15 +61,14 @@
     <div id="ui">
         <div class="stat">SCORE: <span id="score">0</span></div>
         <div class="stat">VIDAS: <span id="lives">3</span></div>
-        <div id="level-msg" style="color: #ffff00;">NÍVEL 1: PATRULHA</div>
+        <div id="level-msg" style="color: #ffff00;">INVASÃO ALIEN INICIADA</div>
     </div>
     <div id="game-over">
-        <h1>FROTA DESTRUÍDA</h1>
-        <button onclick="location.reload()">REINICIAR</button>
+        <h1>TERRA CONQUISTADA</h1>
+        <button onclick="location.reload()">REVIDAR</button>
     </div>
     <div id="player">
-        <div class="thrust"></div>
-        <div id="shield-visual" style="display:none; position:absolute; width:110px; height:110px; border:4px solid #00d2ff; border-radius:50%; top:50%; left:50%; transform:translate(-50%,-50%); box-shadow:0 0 20px #00d2ff;"></div>
+        <div id="shield-visual" style="display:none; position:absolute; width:110px; height:110px; border:3px solid #00d2ff; border-radius:50%; top:-15px; left:-25px; box-shadow:0 0 15px #00d2ff;"></div>
         <div class="cannon left"></div>
         <div class="cannon right"></div>
     </div>
@@ -76,14 +79,13 @@
     const player = document.getElementById('player');
     const shieldVis = document.getElementById('shield-visual');
     let playerX = window.innerWidth / 2;
-    let score = 0, lives = 3, level = 1, active = true, isShielded = false, bossActive = false;
+    let score = 0, lives = 3, level = 1, active = true, isShielded = false;
     let timeScale = 1;
 
-    // NOVO CONTROLE PELO MOUSE
+    // CONTROLE MOUSE
     document.addEventListener('mousemove', (e) => {
         if (!active) return;
         playerX = e.clientX;
-        // Mantém a nave dentro da tela
         playerX = Math.max(50, Math.min(window.innerWidth - 50, playerX));
         player.style.left = playerX + 'px';
     });
@@ -91,169 +93,68 @@
     // TIRO JOGADOR
     setInterval(() => {
         if (!active) return;
-        if (level === 1) createBullet(0);
-        else if (level === 2) { createBullet(-25); createBullet(25); }
-        else { createBullet(-25); createBullet(0, true); createBullet(25); }
-    }, 180);
+        createBullet(0);
+        if(level >= 2) { createBullet(-25); createBullet(25); }
+    }, 200);
 
-    function createBullet(offset, special = false) {
+    function createBullet(offset) {
         const b = document.createElement('div');
         b.className = 'bullet';
-        if (special) { b.style.background = '#00d2ff'; b.style.width = '8px'; }
         b.style.left = (playerX + offset - 2) + 'px';
-        b.style.bottom = '105px';
+        b.style.bottom = '100px';
         container.appendChild(b);
-        let pos = 105;
+        let pos = 100;
         const move = setInterval(() => {
-            pos += 22; b.style.bottom = pos + 'px';
-            document.querySelectorAll('.alien, .boss, .meteor').forEach(t => {
+            pos += 15; b.style.bottom = pos + 'px';
+            document.querySelectorAll('.alien, .meteor').forEach(t => {
                 if (checkCol(b, t)) {
-                    if (t.classList.contains('boss')) { t.hp--; if (t.hp <= 0) { explode(t); score += 5000; t.remove(); bossActive = false; } }
-                    else if (t.classList.contains('meteor')) { t.hp--; if (t.hp <= 0) { explode(t); score += 50; t.remove(); } }
-                    else { explode(t); score += 100; t.remove(); }
-                    b.remove(); clearInterval(move); updateProgress();
+                    explode(t);
+                    t.remove(); b.remove(); clearInterval(move);
+                    score += 100; updateUI();
                 }
             });
             if (pos > window.innerHeight) { b.remove(); clearInterval(move); }
         }, 16);
     }
 
-    function spawnMeteor() {
+    // SPAWN ALIENS QUE ATIRAM
+    function spawnAlien() {
         if (!active) return;
-        const m = document.createElement('div');
-        const size = Math.random() * 60 + 40;
-        m.className = 'meteor'; m.hp = 3;
-        m.style.width = size + 'px'; m.style.height = size + 'px';
-        m.style.left = Math.random() * (window.innerWidth - size) + 'px';
-        m.style.top = '-' + size + 'px';
-        container.appendChild(m);
-        let y = -size;
+        const a = document.createElement('div');
+        a.className = 'alien';
+        a.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+        a.style.top = '-50px';
+        container.appendChild(a);
+
+        let y = -50;
         const move = setInterval(() => {
-            y += (Math.random() * 2 + 2) * timeScale;
-            m.style.top = y + 'px';
-            if (checkCol(m, player)) { takeDamage(); explode(m); m.remove(); clearInterval(move); }
-            if (y > window.innerHeight || !m.parentElement) { m.remove(); clearInterval(move); }
+            y += 2.5 * timeScale;
+            a.style.top = y + 'px';
+
+            // Chance do Alien atirar
+            if (Math.random() < 0.01 * timeScale) alienShoot(a);
+
+            if (checkCol(a, player)) { takeDamage(); a.remove(); clearInterval(move); }
+            if (y > window.innerHeight) { a.remove(); clearInterval(move); }
+        }, 30);
+    }
+
+    function alienShoot(alien) {
+        if (!alien.parentElement) return;
+        const laser = document.createElement('div');
+        laser.className = 'alien-laser';
+        const rect = alien.getBoundingClientRect();
+        laser.style.left = (rect.left + rect.width/2) + 'px';
+        laser.style.top = rect.bottom + 'px';
+        container.appendChild(laser);
+
+        let ly = rect.bottom;
+        const lMove = setInterval(() => {
+            ly += 7 * timeScale;
+            laser.style.top = ly + 'px';
+            if (checkCol(laser, player)) { takeDamage(); laser.remove(); clearInterval(lMove); }
+            if (ly > window.innerHeight) { laser.remove(); clearInterval(lMove); }
         }, 20);
     }
 
-    function spawnAlien() {
-        if (!active || bossActive) return;
-        const a = document.createElement('div');
-        a.className = 'alien';
-        a.style.left = Math.random() * (window.innerWidth - 60) + 'px';
-        a.style.top = '-50px';
-        container.appendChild(a);
-        const fire = setInterval(() => {
-            if (Math.random() < 0.3 * timeScale) {
-                const ab = document.createElement('div');
-                ab.className = 'alien-bullet';
-                const r = a.getBoundingClientRect();
-                ab.style.left = (r.left + r.width/2) + 'px'; ab.style.top = r.bottom + 'px';
-                container.appendChild(ab);
-                let ay = r.bottom;
-                const am = setInterval(() => {
-                    ay += 9 * timeScale; ab.style.top = ay + 'px';
-                    if (checkCol(ab, player)) { takeDamage(); ab.remove(); clearInterval(am); }
-                    if (ay > window.innerHeight || !active) { ab.remove(); clearInterval(am); }
-                }, 20);
-            }
-            if (!a.parentElement) clearInterval(fire);
-        }, 1800);
-        let y = -50;
-        const move = setInterval(() => {
-            y += 3 * timeScale; a.style.top = y + 'px';
-            if (checkCol(a, player)) { takeDamage(); a.remove(); clearInterval(move); }
-            if (y > window.innerHeight || !a.parentElement) { a.remove(); clearInterval(move); }
-        }, 30);
-    }
-
-    function spawnPowerUp() {
-        if (!active) return;
-        const isTime = Math.random() > 0.5;
-        const p = document.createElement('div');
-        p.className = 'power-up';
-        p.innerText = isTime ? 'T' : 'S';
-        p.style.background = isTime ? '#00fbff' : '#00d2ff';
-        p.style.color = isTime ? '#000' : '#fff';
-        p.style.left = Math.random() * 90 + 'vw'; p.style.top = '-40px';
-        container.appendChild(p);
-        let y = -40;
-        const m = setInterval(() => {
-            y += 3; p.style.top = y + 'px';
-            if (checkCol(p, player)) {
-                if(isTime) activateSlowMo(); else activateShield();
-                p.remove(); clearInterval(m);
-            }
-            if (y > window.innerHeight) { p.remove(); clearInterval(m); }
-        }, 30);
-    }
-
-    function activateSlowMo() {
-        timeScale = 0.3; container.classList.add('slow-mo');
-        setTimeout(() => { timeScale = 1; container.classList.remove('slow-mo'); }, 5000);
-    }
-
-    function activateShield() {
-        isShielded = true; shieldVis.style.display = 'block';
-        setTimeout(() => { isShielded = false; shieldVis.style.display = 'none'; }, 6000);
-    }
-
-    function updateProgress() {
-        document.getElementById('score').innerText = score;
-        let m = document.getElementById('level-msg');
-        if (score >= 2500 && level === 1) level = 2;
-        if (score >= 6000 && level === 2) { level = 3; player.classList.add('gold'); }
-        if (score >= 10000 && !bossActive) { bossActive = true; spawnBoss(); }
-        m.innerText = `NÍVEL ${level}: ${level === 3 ? 'GUERRA DOURADA' : (level === 2 ? 'CANHÕES' : 'PATRULHA')}`;
-    }
-
-    function spawnBoss() {
-        const b = document.createElement('div');
-        b.className = 'boss'; b.hp = 80;
-        b.style.left = '50%'; b.style.transform = 'translateX(-50%)'; b.style.top = '-120px';
-        container.appendChild(b);
-        setTimeout(() => b.style.top = '70px', 100);
-    }
-
-    function takeDamage() {
-        if (isShielded) return;
-        lives--; document.getElementById('lives').innerText = lives;
-        container.classList.add('shake'); setTimeout(() => container.classList.remove('shake'), 300);
-        if (lives <= 0) { active = false; document.body.style.cursor = 'default'; document.getElementById('game-over').style.display = 'block'; }
-    }
-
-    function checkCol(a, b) {
-        const r1 = a.getBoundingClientRect(), r2 = b.getBoundingClientRect();
-        return !(r1.top > r2.bottom || r1.bottom < r2.top || r1.right < r2.left || r1.left > r2.right);
-    }
-
-    function explode(t) {
-        const r = t.getBoundingClientRect();
-        for(let i=0; i<8; i++) {
-            const p = document.createElement('div');
-            p.style.cssText = `position:absolute; width:4px; height:4px; background:#ff4757; left:${r.left+r.width/2}px; top:${r.top+r.height/2}px; border-radius:50%; z-index:20;`;
-            container.appendChild(p);
-            const ang = Math.random()*Math.PI*2, vel = Math.random()*5;
-            let x=r.left+r.width/2, y=r.top+r.height/2, op=1;
-            const move = setInterval(() => {
-                x+=Math.cos(ang)*vel; y+=Math.sin(ang)*vel; op-=0.05;
-                p.style.left=x+'px'; p.style.top=y+'px'; p.style.opacity=op;
-                if(op<=0){ p.remove(); clearInterval(move); }
-            }, 20);
-        }
-    }
-
-    // Estrelas
-    for(let i=0; i<80; i++) {
-        const s = document.createElement('div'); s.className = 'star';
-        s.style.width = s.style.height = Math.random()*3+'px';
-        s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*100+'vh';
-        s.style.animationDuration = (Math.random()*3+3)+'s'; container.appendChild(s);
-    }
-
-    setInterval(spawnAlien, 1200);
-    setInterval(spawnMeteor, 3500);
-    setInterval(spawnPowerUp, 15000);
-</script>
-</body>
-</html>
+    function spawnMeteor

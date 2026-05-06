@@ -1,25 +1,34 @@
-/* Chefão Estilizado */
-.boss { 
-    width: 160px; 
-    height: 90px; 
-    background: linear-gradient(180deg, #4b0082, #000); 
-    position: absolute; 
-    border-radius: 20px 20px 80px 80px; 
-    box-shadow: 0 0 50px #ff00ff; 
-    z-index: 5; 
-    border: 2px solid #ff00ff;
+// --- SISTEMA DE ESTRELAS DE FUNDO ---
+function generateUniverse() {
+    // Número de estrelas
+    const starCount = 80;
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+
+        // Tamanho aleatório (pequenas e grandes)
+        const size = Math.random() * 3 + 1; // Entre 1px e 4px
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+
+        // Posição horizontal aleatória
+        star.style.left = Math.random() * 100 + 'vw';
+
+        // Posição vertical inicial aleatória
+        star.style.top = Math.random() * 100 + 'vh';
+
+        // Duração da animação aleatória (Parallax)
+        // Estrelas maiores parecem cair mais rápido
+        const duration = (Math.random() * 3 + 3) * (5 / size); 
+        star.style.animationDuration = duration + 's';
+
+        // Brilho aleatório
+        star.style.opacity = Math.random() * 0.5 + 0.2;
+
+        container.appendChild(star);
+    }
 }
 
-/* Olhos do Chefão */
-.boss::before, .boss::after {
-    content: '';
-    position: absolute;
-    width: 25px;
-    height: 8px;
-    background: #ff0000;
-    top: 35px;
-    box-shadow: 0 0 15px #ff0000;
-    border-radius: 50%;
-}
-.boss::before { left: 35px; transform: rotate(-10deg); }
-.boss::after { right: 35px; transform: rotate(10deg); }
+// Inicia o universo quando o jogo começa
+generateUniverse();

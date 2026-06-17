@@ -1,258 +1,636 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
+    <!-- ================================================ -->
+    <!-- SEÇÃO 1: CONFIGURAÇÃO DO CABEÇALHO (HEAD) -->
+    <!-- ================================================ -->
+    
+    <!-- Linha 1: Declaração do tipo de documento HTML5 -->
+    <!-- Isso informa ao navegador que estamos usando HTML moderno -->
+    
+    <!-- Linha 2: Tag de abertura do HTML com idioma português do Brasil -->
+    <!-- lang="pt-BR" ajuda ferramentas de acessibilidade e SEO -->
+    
+    <!-- Linha 3: Início da seção <head> - metadados da página -->
+    
+    <!-- Linha 4: Meta tag de charset para suportar acentos e caracteres especiais -->
+    <!-- UTF-8 é o padrão recomendado para português -->
     <meta charset="UTF-8">
+    
+    <!-- Linha 5: Meta tag para responsividade em dispositivos móveis -->
+    <!-- viewport controla como a página é exibida em celulares e tablets -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warship Defender: Russian Fleet Invasion</title>
-    <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; user-select: none; cursor: none; }
-        #game-container { width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%); position: relative; overflow: hidden; transition: filter 0.5s; }
+    
+    <!-- Linha 6: Título da página que aparece na aba do navegador -->
+    <title>Calculadora de IMC - Índice de Massa Corporal</title>
+    
+    <!-- Linha 7: Descrição da página para mecanismos de busca -->
+    <meta name="description" content="Calculadora de IMC gratuita e precisa. Calcule seu Índice de Massa Corporal de forma simples e veja sua classificação segundo a OMS.">
+    
+    <!-- Linha 8: Inclusão do Tailwind CSS via CDN (Playground) -->
+    <!-- Tailwind é um framework CSS moderno que permite criar interfaces bonitas rapidamente -->
+    <!-- Usamos a versão Play CDN para não precisar instalar nada -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Linha 9: Script para customizar o Tailwind (cores e estilos) -->
+    <!-- Aqui definimos cores personalizadas para o tema de saúde -->
+    <script>
+        // Linha 10: Função que configura o Tailwind quando a página carrega
+        function configurarTailwind() {
+            // Linha 11: tailwind.config é um objeto de configuração do Tailwind
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        // Linha 12: Cores personalizadas para o projeto
+                        colors: {
+                            'imc-blue': '#0ea5e9',      // Azul principal (saúde)
+                            'imc-green': '#22c55e',     // Verde para normal
+                            'imc-yellow': '#eab308',    // Amarelo para sobrepeso
+                            'imc-red': '#ef4444',       // Vermelho para obesidade/baixo peso
+                            'imc-dark': '#0f172a',      // Fundo escuro elegante
+                        }
+                    }
+                }
+            };
+        }
         
-        .slow-mo { filter: sepia(0.5) hue-rotate(180deg) brightness(1.2); }
-
-        /* HUD */
-        #ui { position: absolute; top: 20px; left: 20px; color: #fff; z-index: 100; pointer-events: none; }
-        .stat { font-size: 22px; font-weight: bold; text-shadow: 0 0 10px #00ff41; margin-bottom: 5px; }
-
-        /* NAVE DO JOGADOR */
-        #player {
-            width: 60px; height: 80px; position: absolute; bottom: 30px; left: 50%;
-            transform: translateX(-50%); background: #535c68; border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5); z-index: 10; border: 2px solid #3d464d;
+        // Linha 13: Executa a configuração assim que o script é carregado
+        configurarTailwind();
+    </script>
+    
+    <!-- Linha 14: Estilos CSS adicionais personalizados -->
+    <!-- Usamos <style> para ajustes finos que o Tailwind não cobre facilmente -->
+    <style>
+        /* Linha 15: Estilo para o card principal com sombra suave */
+        .card-imc {
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        #player.gold { background: #ffd700; box-shadow: 0 0 30px #ffd700; border-color: #b8860b; }
-        #player::before { content: ''; position: absolute; top: -15px; left: 15px; width: 30px; height: 30px; background: #747d8c; border-radius: 5px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); border: 2px solid #3d464d; }
-        #player::after { content: ''; position: absolute; bottom: 0; left: -20px; width: 100px; height: 40px; background: #4a5159; border-radius: 5px; clip-path: polygon(0% 100%, 15% 0%, 85% 0%, 100% 100%); border: 2px solid #3d464d; z-index: -1; }
-        .cannon { position: absolute; width: 8px; height: 25px; background: #3d464d; border: 1px solid #2c3136; top: 40px; }
-        .cannon.left { left: -5px; } .cannon.right { right: -5px; }
-        .thrust { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); width: 20px; height: 25px; background: linear-gradient(to bottom, #ff9f43, transparent); border-radius: 0 0 50% 50%; animation: flicker 0.1s infinite alternate; }
-        @keyframes flicker { from { height: 15px; } to { height: 30px; } }
-
-        /* INIMIGOS: NAVES RUSSAS */
-        .alien {
-            width: 50px; height: 40px; position: absolute; 
-            background: linear-gradient(to bottom, #fff 33%, #0039a6 33%, #0039a6 66%, #d52b1e 66%);
-            border-radius: 3px; border: 1px solid #333; z-index: 5;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        
+        /* Linha 16: Efeito de hover no card (eleva um pouco quando o mouse passa por cima) */
+        .card-imc:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
         }
-        /* Detalhe da cabine da nave russa */
-        .alien::before {
-            content: ''; position: absolute; top: 10px; left: 15px; width: 20px; height: 10px;
-            background: #2c3e50; border-radius: 2px;
+        
+        /* Linha 17: Estilo para os inputs (campos de digitação) */
+        .input-imc {
+            transition: all 0.2s ease;
         }
-
-        /* CHEFÃO: DREADNOUGHT RUSSO */
-        .boss {
-            width: 250px; height: 120px; position: absolute; z-index: 6;
-            background: linear-gradient(to bottom, #fff 33%, #0039a6 33%, #0039a6 66%, #d52b1e 66%);
-            border: 4px solid #2c3e50; border-radius: 10px 10px 100px 100px;
-            box-shadow: 0 0 50px rgba(213, 43, 30, 0.5);
+        
+        .input-imc:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+            border-color: #0ea5e9;
         }
-
-        /* OUTROS ELEMENTOS */
-        .meteor { position: absolute; background: #5d4037; border-radius: 40%; box-shadow: inset -10px -10px 0 rgba(0,0,0,0.3); z-index: 4; }
-        .bullet { width: 5px; height: 20px; background: #ffff00; position: absolute; box-shadow: 0 0 10px #ffff00; border-radius: 2px; }
-        .alien-bullet { width: 6px; height: 15px; background: #ff4757; position: absolute; border-radius: 3px; }
-        .power-up { width: 35px; height: 35px; position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; animation: rot 2s infinite linear; }
-        @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        #game-over { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; z-index: 1000; background: rgba(0,0,0,0.9); padding: 50px; border: 3px solid #ff4757; border-radius: 20px; }
-        button { padding: 15px 30px; background: #00ff41; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 20px; }
+        
+        /* Linha 18: Animação suave para o resultado aparecer */
+        .resultado-animado {
+            animation: fadeInUp 0.4s ease forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Linha 19: Estilo para a tabela de classificação */
+        .tabela-imc th, .tabela-imc td {
+            padding: 12px 16px;
+            text-align: left;
+        }
+        
+        /* Linha 20: Linhas alternadas na tabela para melhor leitura */
+        .tabela-imc tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
     </style>
 </head>
-<body>
 
-<div id="game-container">
-    <div id="ui">
-        <div class="stat">SCORE: <span id="score">0</span></div>
-        <div class="stat">VIDAS: <span id="lives">3</span></div>
-        <div id="level-msg" style="color: #ffff00;">PATRULHA DE FRONTEIRA</div>
-    </div>
-    <div id="game-over">
-        <h1>FROTA DESTRUÍDA</h1>
-        <button onclick="location.reload()">REINICIAR MISSÃO</button>
-    </div>
-    <div id="player">
-        <div class="thrust"></div>
-        <div id="shield-visual" style="display:none; position:absolute; width:110px; height:110px; border:4px solid #00d2ff; border-radius:50%; top:50%; left:50%; transform:translate(-50%,-50%); box-shadow:0 0 20px #00d2ff;"></div>
-        <div class="cannon left"></div>
-        <div class="cannon right"></div>
-    </div>
-</div>
+<!-- ================================================ -->
+<!-- SEÇÃO 2: CORPO DA PÁGINA (BODY) -->
+<!-- ================================================ -->
 
-<script>
-    const container = document.getElementById('game-container');
-    const player = document.getElementById('player');
-    const shieldVis = document.getElementById('shield-visual');
-    let playerX = window.innerWidth / 2;
-    let score = 0, lives = 3, level = 1, active = true, isShielded = false, bossActive = false;
-    let timeScale = 1;
-
-    // CONTROLE MOUSE
-    document.addEventListener('mousemove', (e) => {
-        if (!active) return;
-        playerX = Math.max(50, Math.min(window.innerWidth - 50, e.clientX));
-        player.style.left = playerX + 'px';
-    });
-
-    // SISTEMA DE TIRO
-    setInterval(() => {
-        if (!active) return;
-        if (level === 1) createBullet(0);
-        else if (level === 2) { createBullet(-25); createBullet(25); }
-        else { createBullet(-25); createBullet(0, true); createBullet(25); }
-    }, 180);
-
-    function createBullet(offset, special = false) {
-        const b = document.createElement('div');
-        b.className = 'bullet';
-        if (special) { b.style.background = '#00d2ff'; b.style.width = '8px'; }
-        b.style.left = (playerX + offset - 2) + 'px';
-        b.style.bottom = '105px';
-        container.appendChild(b);
-        let pos = 105;
-        const move = setInterval(() => {
-            pos += 22; b.style.bottom = pos + 'px';
-            document.querySelectorAll('.alien, .boss, .meteor').forEach(t => {
-                if (checkCol(b, t)) {
-                    if (t.classList.contains('boss')) { t.hp--; if (t.hp <= 0) { explode(t); score += 5000; t.remove(); bossActive = false; } }
-                    else if (t.classList.contains('meteor')) { t.hp--; if (t.hp <= 0) { explode(t); score += 50; t.remove(); } }
-                    else { explode(t); score += 100; t.remove(); }
-                    b.remove(); clearInterval(move); updateProgress();
-                }
-            });
-            if (pos > window.innerHeight) { b.remove(); clearInterval(move); }
-        }, 16);
-    }
-
-    // SPAWN NAVES RUSSAS (Substitui os aliens)
-    function spawnRussianShip() {
-        if (!active || bossActive) return;
-        const a = document.createElement('div');
-        a.className = 'alien';
-        a.style.left = Math.random() * (window.innerWidth - 60) + 'px';
-        a.style.top = '-50px';
-        container.appendChild(a);
+<body class="bg-slate-100 min-h-screen py-8 px-4">
+    <!-- Linha 21: Container principal centralizado -->
+    <!-- max-w-2xl limita a largura máxima para não ficar muito largo em telas grandes -->
+    <div class="max-w-2xl mx-auto">
         
-        const fire = setInterval(() => {
-            if (Math.random() < 0.3 * timeScale) {
-                const ab = document.createElement('div');
-                ab.className = 'alien-bullet';
-                const r = a.getBoundingClientRect();
-                ab.style.left = (r.left + r.width/2) + 'px';
-                ab.style.top = r.bottom + 'px';
-                container.appendChild(ab);
-                let ay = r.bottom;
-                const am = setInterval(() => {
-                    ay += 9 * timeScale; ab.style.top = ay + 'px';
-                    if (checkCol(ab, player)) { takeDamage(); ab.remove(); clearInterval(am); }
-                    if (ay > window.innerHeight || !active) { ab.remove(); clearInterval(am); }
-                }, 20);
+        <!-- ================================================ -->
+        <!-- CABEÇALHO / HEADER -->
+        <!-- ================================================ -->
+        
+        <!-- Linha 22: Cabeçalho com título e subtítulo -->
+        <div class="text-center mb-8">
+            <!-- Linha 23: Ícone grande de calculadora -->
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-4">
+                <span class="text-4xl">🧮</span>
+            </div>
+            
+            <!-- Linha 24: Título principal da página -->
+            <h1 class="text-4xl font-bold text-slate-800 tracking-tight">
+                Calculadora de IMC
+            </h1>
+            
+            <!-- Linha 25: Subtítulo explicativo -->
+            <p class="mt-2 text-lg text-slate-600">
+                Descubra seu Índice de Massa Corporal de forma rápida e precisa
+            </p>
+            
+            <!-- Linha 26: Badge informativo -->
+            <div class="inline-flex items-center gap-2 mt-3 px-4 py-1.5 bg-white rounded-full shadow-sm border border-slate-200">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span class="text-sm font-medium text-slate-700">Baseado nas tabelas da OMS</span>
+            </div>
+        </div>
+        
+        <!-- ================================================ -->
+        <!-- CARD PRINCIPAL COM O FORMULÁRIO -->
+        <!-- ================================================ -->
+        
+        <!-- Linha 27: Card branco com bordas arredondadas e sombra -->
+        <div class="card-imc bg-white rounded-3xl p-8 border border-slate-200">
+            
+            <!-- Linha 28: Título do formulário -->
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
+                    <span class="text-2xl">📝</span>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-semibold text-slate-800">Calcule seu IMC</h2>
+                    <p class="text-sm text-slate-500">Preencha os campos abaixo com seus dados</p>
+                </div>
+            </div>
+            
+            <!-- ================================================ -->
+            <!-- FORMULÁRIO DE ENTRADA DE DADOS -->
+            <!-- ================================================ -->
+            
+            <!-- Linha 29: Início do formulário -->
+            <!-- onsubmit="return false" impede o envio tradicional do formulário -->
+            <form id="form-imc" onsubmit="return false;" class="space-y-6">
+                
+                <!-- Linha 30: Campo de PESO -->
+                <div>
+                    <!-- Linha 31: Label do campo peso -->
+                    <label for="peso" class="block text-sm font-semibold text-slate-700 mb-2">
+                        ⚖️ Peso (em quilogramas)
+                    </label>
+                    
+                    <!-- Linha 32: Input para peso -->
+                    <!-- type="number" aceita apenas números -->
+                    <!-- step="0.1" permite uma casa decimal -->
+                    <!-- required torna o campo obrigatório -->
+                    <div class="relative">
+                        <input 
+                            type="number" 
+                            id="peso" 
+                            step="0.1" 
+                            min="1" 
+                            max="300"
+                            placeholder="Ex: 72.5"
+                            class="input-imc w-full px-4 py-3.5 text-lg border border-slate-300 rounded-2xl focus:border-sky-500 bg-slate-50 placeholder:text-slate-400"
+                            required
+                        >
+                        <!-- Linha 33: Unidade de medida ao lado do input -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">
+                            kg
+                        </div>
+                    </div>
+                    <!-- Linha 34: Texto de ajuda -->
+                    <p class="mt-1.5 text-xs text-slate-500">Digite seu peso atual com uma casa decimal se necessário</p>
+                </div>
+                
+                <!-- Linha 35: Campo de ALTURA -->
+                <div>
+                    <!-- Linha 36: Label do campo altura -->
+                    <label for="altura" class="block text-sm font-semibold text-slate-700 mb-2">
+                        📏 Altura (em metros)
+                    </label>
+                    
+                    <!-- Linha 37: Input para altura -->
+                    <div class="relative">
+                        <input 
+                            type="number" 
+                            id="altura" 
+                            step="0.01" 
+                            min="0.5" 
+                            max="2.5"
+                            placeholder="Ex: 1.78"
+                            class="input-imc w-full px-4 py-3.5 text-lg border border-slate-300 rounded-2xl focus:border-sky-500 bg-slate-50 placeholder:text-slate-400"
+                            required
+                        >
+                        <!-- Linha 38: Unidade de medida -->
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">
+                            m
+                        </div>
+                    </div>
+                    <!-- Linha 39: Texto de ajuda -->
+                    <p class="mt-1.5 text-xs text-slate-500">Exemplo: 1,75m = 1.75 (use ponto como separador decimal)</p>
+                </div>
+                
+                <!-- Linha 40: Botão de calcular -->
+                <!-- type="button" para não submeter o formulário -->
+                <!-- onclick chama a função JavaScript que calcula o IMC -->
+                <button 
+                    type="button"
+                    onclick="calcularIMC()"
+                    class="w-full mt-4 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 transition-all text-white font-semibold text-lg py-4 rounded-2xl shadow-lg shadow-sky-500/30 flex items-center justify-center gap-3"
+                >
+                    <span>🧮</span>
+                    <span>CALCULAR MEU IMC</span>
+                </button>
+                
+                <!-- Linha 41: Botão secundário para limpar campos -->
+                <button 
+                    type="button"
+                    onclick="limparCampos()"
+                    class="w-full text-slate-600 hover:text-slate-800 font-medium py-2 text-sm flex items-center justify-center gap-2 transition-colors"
+                >
+                    <span>🔄</span>
+                    <span>Limpar campos e começar novamente</span>
+                </button>
+                
+            </form>
+            
+            <!-- ================================================ -->
+            <!-- ÁREA DE RESULTADO (inicialmente escondida) -->
+            <!-- ================================================ -->
+            
+            <!-- Linha 42: Div que vai mostrar o resultado após o cálculo -->
+            <!-- Começa com classe "hidden" para ficar invisível -->
+            <div id="resultado" class="hidden mt-8 pt-8 border-t border-slate-200">
+                
+                <!-- Linha 43: Cabeçalho do resultado -->
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">📊</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-slate-800">Seu Resultado</h3>
+                        <p class="text-sm text-slate-500">Cálculo realizado com sucesso</p>
+                    </div>
+                </div>
+                
+                <!-- Linha 44: Card do valor do IMC -->
+                <div class="bg-slate-900 text-white rounded-2xl p-6 mb-6">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <!-- Linha 45: Label -->
+                            <p class="text-slate-400 text-sm tracking-wider">SEU ÍNDICE DE MASSA CORPORAL</p>
+                            
+                            <!-- Linha 46: O valor do IMC será inserido aqui pelo JavaScript -->
+                            <div id="valor-imc" class="text-6xl font-bold tracking-tighter mt-1"></div>
+                            
+                            <!-- Linha 47: Unidade -->
+                            <p class="text-slate-400">kg/m²</p>
+                        </div>
+                        
+                        <!-- Linha 48: Emoji grande que muda conforme a classificação -->
+                        <div id="emoji-resultado" class="text-7xl"></div>
+                    </div>
+                </div>
+                
+                <!-- Linha 49: Classificação e mensagem -->
+                <div class="mb-6">
+                    <!-- Linha 50: Classificação com cor dinâmica -->
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-sm font-semibold text-slate-600">CLASSIFICAÇÃO:</span>
+                        <!-- Linha 51: Span que recebe a classificação (Peso normal, Sobrepeso, etc) -->
+                        <span id="classificacao" 
+                              class="px-4 py-1.5 rounded-full text-sm font-bold"></span>
+                    </div>
+                    
+                    <!-- Linha 52: Mensagem educativa -->
+                    <div id="mensagem" 
+                         class="text-slate-700 leading-relaxed">
+                    </div>
+                </div>
+                
+                <!-- Linha 53: Botão para calcular novamente -->
+                <button 
+                    onclick="reiniciarCalculadora()"
+                    class="w-full border border-slate-300 hover:bg-slate-50 transition-colors text-slate-700 font-medium py-3 rounded-2xl flex items-center justify-center gap-2"
+                >
+                    <span>🔄</span>
+                    <span>Calcular novamente</span>
+                </button>
+            </div>
+            
+        </div>
+        
+        <!-- ================================================ -->
+        <!-- TABELA DE CLASSIFICAÇÃO DO IMC -->
+        <!-- ================================================ -->
+        
+        <!-- Linha 54: Seção com a tabela explicativa -->
+        <div class="mt-8 bg-white rounded-3xl p-8 border border-slate-200">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
+                    <span class="text-xl">📋</span>
+                </div>
+                <h3 class="text-xl font-semibold text-slate-800">Tabela de Classificação do IMC</h3>
+            </div>
+            
+            <p class="text-sm text-slate-600 mb-4">
+                Esta é a classificação oficial segundo a <strong>Organização Mundial da Saúde (OMS)</strong>:
+            </p>
+            
+            <!-- Linha 55: Tabela responsiva -->
+            <div class="overflow-x-auto">
+                <table class="tabela-imc w-full text-sm border border-slate-200 rounded-2xl overflow-hidden">
+                    <thead class="bg-slate-800 text-white">
+                        <tr>
+                            <th class="font-semibold">IMC (kg/m²)</th>
+                            <th class="font-semibold">Classificação</th>
+                            <th class="font-semibold">Risco à Saúde</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-slate-700">
+                        <!-- Linha 56: Linha da tabela - Abaixo do peso -->
+                        <tr>
+                            <td class="font-mono font-medium text-red-600">&lt; 18,5</td>
+                            <td><span class="inline-block px-3 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-bold">Abaixo do peso</span></td>
+                            <td class="text-red-600">Baixo</td>
+                        </tr>
+                        <!-- Linha 57: Peso normal -->
+                        <tr>
+                            <td class="font-mono font-medium text-emerald-600">18,5 – 24,9</td>
+                            <td><span class="inline-block px-3 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">Peso normal</span></td>
+                            <td class="text-emerald-600">Normal</td>
+                        </tr>
+                        <!-- Linha 58: Sobrepeso -->
+                        <tr>
+                            <td class="font-mono font-medium text-amber-600">25,0 – 29,9</td>
+                            <td><span class="inline-block px-3 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">Sobrepeso</span></td>
+                            <td class="text-amber-600">Aumentado</td>
+                        </tr>
+                        <!-- Linha 59: Obesidade grau I -->
+                        <tr>
+                            <td class="font-mono font-medium text-orange-600">30,0 – 34,9</td>
+                            <td><span class="inline-block px-3 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-bold">Obesidade grau I</span></td>
+                            <td class="text-orange-600">Moderado</td>
+                        </tr>
+                        <!-- Linha 60: Obesidade grau II -->
+                        <tr>
+                            <td class="font-mono font-medium text-red-600">35,0 – 39,9</td>
+                            <td><span class="inline-block px-3 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-bold">Obesidade grau II</span></td>
+                            <td class="text-red-600">Alto</td>
+                        </tr>
+                        <!-- Linha 61: Obesidade grau III -->
+                        <tr>
+                            <td class="font-mono font-medium text-red-700">&ge; 40,0</td>
+                            <td><span class="inline-block px-3 py-0.5 bg-red-200 text-red-800 rounded-full text-xs font-bold">Obesidade grau III</span></td>
+                            <td class="text-red-700">Muito alto</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Linha 62: Nota importante -->
+            <div class="mt-5 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-sm">
+                <p class="text-amber-800">
+                    <strong>⚠️ Importante:</strong> O IMC é uma ferramenta de triagem populacional. 
+                    Ele não leva em conta massa muscular, idade, sexo ou composição corporal. 
+                    Sempre consulte um médico ou nutricionista para uma avaliação completa.
+                </p>
+            </div>
+        </div>
+        
+        <!-- ================================================ -->
+        <!-- RODAPÉ / FOOTER -->
+        <!-- ================================================ -->
+        
+        <!-- Linha 63: Rodapé educacional -->
+        <div class="mt-8 text-center text-xs text-slate-500">
+            <p>Calculadora de IMC criada para fins educativos • Baseada nas diretrizes da OMS</p>
+            <p class="mt-1">Este projeto é composto por dois arquivos independentes: <span class="font-mono">app.py</span> (Python) e <span class="font-mono">index.html</span> (Web)</p>
+        </div>
+        
+    </div>
+    
+    <!-- ================================================ -->
+    <!-- SEÇÃO 3: JAVASCRIPT - LÓGICA DO CÁLCULO -->
+    <!-- ================================================ -->
+    
+    <script>
+        // ================================================
+        // FUNÇÃO PRINCIPAL: calcularIMC()
+        // Esta função é chamada quando o usuário clica no botão "CALCULAR MEU IMC"
+        // ================================================
+        
+        function calcularIMC() {
+            // Linha 64: Obtemos os valores digitados nos inputs
+            // document.getElementById() é o método JavaScript para pegar elementos da página
+            const pesoInput = document.getElementById('peso');
+            const alturaInput = document.getElementById('altura');
+            
+            // Linha 65: Convertemos os valores de texto para números decimais
+            // parseFloat() transforma string em número (ex: "72.5" vira 72.5)
+            const peso = parseFloat(pesoInput.value);
+            const altura = parseFloat(alturaInput.value);
+            
+            // ================================================
+            // VALIDAÇÃO DOS DADOS (boa prática de programação)
+            // ================================================
+            
+            // Linha 66: Verificamos se os campos estão vazios ou com valores inválidos
+            if (!peso || !altura || peso <= 0 || altura <= 0) {
+                // Linha 67: Mostramos um alerta amigável
+                alert("⚠️ Por favor, preencha os campos de peso e altura com valores válidos e maiores que zero.");
+                
+                // Linha 68: Focamos no primeiro campo vazio para o usuário corrigir
+                if (!peso || peso <= 0) {
+                    pesoInput.focus();
+                } else {
+                    alturaInput.focus();
+                }
+                return; // Interrompe a função aqui
             }
-            if (!a.parentElement) clearInterval(fire);
-        }, 1800);
-
-        let y = -50;
-        const move = setInterval(() => {
-            y += 3 * timeScale; a.style.top = y + 'px';
-            if (checkCol(a, player)) { takeDamage(); a.remove(); clearInterval(move); }
-            if (y > window.innerHeight || !a.parentElement) { a.remove(); clearInterval(move); }
-        }, 30);
-    }
-
-    function spawnMeteor() {
-        if (!active) return;
-        const m = document.createElement('div');
-        const size = Math.random() * 60 + 40;
-        m.className = 'meteor'; m.hp = 3;
-        m.style.width = size + 'px'; m.style.height = size + 'px';
-        m.style.left = Math.random() * (window.innerWidth - size) + 'px';
-        m.style.top = '-' + size + 'px';
-        container.appendChild(m);
-        let y = -size;
-        const move = setInterval(() => {
-            y += (Math.random() * 2 + 2) * timeScale;
-            m.style.top = y + 'px';
-            if (checkCol(m, player)) { takeDamage(); explode(m); m.remove(); clearInterval(move); }
-            if (y > window.innerHeight || !m.parentElement) { m.remove(); clearInterval(move); }
-        }, 20);
-    }
-
-    function spawnPowerUp() {
-        if (!active) return;
-        const isTime = Math.random() > 0.5;
-        const p = document.createElement('div');
-        p.className = 'power-up';
-        p.innerText = isTime ? 'T' : 'S';
-        p.style.background = isTime ? '#00fbff' : '#00d2ff';
-        p.style.left = Math.random() * 90 + 'vw'; p.style.top = '-40px';
-        container.appendChild(p);
-        let y = -40;
-        const m = setInterval(() => {
-            y += 3; p.style.top = y + 'px';
-            if (checkCol(p, player)) {
-                if(isTime) { timeScale = 0.3; container.classList.add('slow-mo'); setTimeout(() => { timeScale = 1; container.classList.remove('slow-mo'); }, 5000); }
-                else { isShielded = true; shieldVis.style.display = 'block'; setTimeout(() => { isShielded = false; shieldVis.style.display = 'none'; }, 6000); }
-                p.remove(); clearInterval(m);
+            
+            // Linha 69: Validação extra - altura muito baixa ou alta (proteção)
+            if (altura < 0.5 || altura > 2.5) {
+                alert("⚠️ Altura fora do intervalo realista. Por favor, verifique o valor digitado.");
+                alturaInput.focus();
+                return;
             }
-            if (y > window.innerHeight) { p.remove(); clearInterval(m); }
-        }, 30);
-    }
-
-    function updateProgress() {
-        document.getElementById('score').innerText = score;
-        let m = document.getElementById('level-msg');
-        if (score >= 2500 && level === 1) level = 2;
-        if (score >= 6000 && level === 2) { level = 3; player.classList.add('gold'); }
-        if (score >= 10000 && !bossActive) { bossActive = true; spawnBoss(); }
-        m.innerText = `NÍVEL ${level}: ${level === 3 ? 'GUERRA DOURADA' : (level === 2 ? 'FROTA RUSSIA' : 'PATRULHA')}`;
-    }
-
-    function spawnBoss() {
-        const b = document.createElement('div');
-        b.className = 'boss'; b.hp = 100;
-        b.style.left = '50%'; b.style.transform = 'translateX(-50%)'; b.style.top = '-150px';
-        container.appendChild(b);
-        setTimeout(() => b.style.top = '70px', 100);
-    }
-
-    function takeDamage() {
-        if (isShielded) return;
-        lives--; document.getElementById('lives').innerText = lives;
-        if (lives <= 0) { active = false; document.body.style.cursor = 'default'; document.getElementById('game-over').style.display = 'block'; }
-    }
-
-    function checkCol(a, b) {
-        const r1 = a.getBoundingClientRect(), r2 = b.getBoundingClientRect();
-        return !(r1.top > r2.bottom || r1.bottom < r2.top || r1.right < r2.left || r1.left > r2.right);
-    }
-
-    function explode(t) {
-        const r = t.getBoundingClientRect();
-        for(let i=0; i<10; i++) {
-            const p = document.createElement('div');
-            p.style.cssText = `position:absolute; width:5px; height:5px; background:#ff4757; left:${r.left+r.width/2}px; top:${r.top+r.height/2}px; border-radius:50%; z-index:20;`;
-            container.appendChild(p);
-            const ang = Math.random()*Math.PI*2, vel = Math.random()*5;
-            let x=r.left+r.width/2, y=r.top+r.height/2, op=1;
-            const move = setInterval(() => {
-                x+=Math.cos(ang)*vel; y+=Math.sin(ang)*vel; op-=0.05;
-                p.style.left=x+'px'; p.style.top=y+'px'; p.style.opacity=op;
-                if(op<=0){ p.remove(); clearInterval(move); }
-            }, 20);
+            
+            // Linha 70: Validação extra - peso muito baixo ou alto
+            if (peso < 1 || peso > 300) {
+                alert("⚠️ Peso fora do intervalo realista. Por favor, verifique o valor digitado.");
+                pesoInput.focus();
+                return;
+            }
+            
+            // ================================================
+            // CÁLCULO DO IMC
+            // ================================================
+            
+            // Linha 71: Aplicamos a fórmula oficial do IMC
+            // IMC = peso ÷ (altura × altura)
+            const imc = peso / (altura * altura);
+            
+            // Linha 72: Arredondamos para 2 casas decimais
+            // toFixed(2) retorna string com 2 casas decimais
+            const imcArredondado = imc.toFixed(2);
+            
+            // ================================================
+            // CLASSIFICAÇÃO DO IMC (mesma lógica do app.py)
+            // ================================================
+            
+            let classificacao = "";
+            let emoji = "";
+            let corClasse = "";
+            let mensagem = "";
+            
+            // Linha 73: Estrutura if-else para definir a classificação
+            if (imc < 18.5) {
+                classificacao = "Abaixo do peso";
+                emoji = "🔴";
+                corClasse = "bg-red-100 text-red-700 border border-red-200";
+                mensagem = "Você está abaixo do peso ideal. Recomenda-se consultar um nutricionista para avaliar sua alimentação e saúde.";
+            } else if (imc < 25) {
+                classificacao = "Peso normal";
+                emoji = "🟢";
+                corClasse = "bg-emerald-100 text-emerald-700 border border-emerald-200";
+                mensagem = "Parabéns! Seu peso está dentro da faixa considerada saudável pela OMS. Continue mantendo bons hábitos!";
+            } else if (imc < 30) {
+                classificacao = "Sobrepeso";
+                emoji = "🟡";
+                corClasse = "bg-amber-100 text-amber-700 border border-amber-200";
+                mensagem = "Você está com sobrepeso. Pequenas mudanças na alimentação e prática regular de exercícios podem trazer grandes benefícios.";
+            } else if (imc < 35) {
+                classificacao = "Obesidade grau I";
+                emoji = "🟠";
+                corClasse = "bg-orange-100 text-orange-700 border border-orange-200";
+                mensagem = "Você está na faixa de obesidade grau I. É importante buscar orientação médica e nutricional para melhorar sua qualidade de vida.";
+            } else if (imc < 40) {
+                classificacao = "Obesidade grau II";
+                emoji = "🔴";
+                corClasse = "bg-red-100 text-red-700 border border-red-200";
+                mensagem = "Você está na faixa de obesidade grau II. Recomenda-se fortemente acompanhamento médico e mudanças no estilo de vida.";
+            } else {
+                classificacao = "Obesidade grau III";
+                emoji = "🔴";
+                corClasse = "bg-red-200 text-red-800 border border-red-300";
+                mensagem = "Você está na faixa de obesidade grau III (mórbida). Procure atendimento médico especializado o quanto antes.";
+            }
+            
+            // ================================================
+            // ATUALIZAÇÃO DA INTERFACE (DOM Manipulation)
+            // ================================================
+            
+            // Linha 74: Pegamos os elementos onde vamos mostrar o resultado
+            const resultadoDiv = document.getElementById('resultado');
+            const valorImcEl = document.getElementById('valor-imc');
+            const emojiEl = document.getElementById('emoji-resultado');
+            const classificacaoEl = document.getElementById('classificacao');
+            const mensagemEl = document.getElementById('mensagem');
+            
+            // Linha 75: Preenchemos o valor do IMC
+            valorImcEl.innerHTML = imcArredondado;
+            
+            // Linha 76: Colocamos o emoji correspondente
+            emojiEl.innerHTML = emoji;
+            
+            // Linha 77: Definimos o texto e as classes de cor da classificação
+            classificacaoEl.innerHTML = classificacao;
+            classificacaoEl.className = `px-4 py-1.5 rounded-full text-sm font-bold ${corClasse}`;
+            
+            // Linha 78: Mostramos a mensagem educativa
+            mensagemEl.innerHTML = mensagem;
+            
+            // Linha 79: Tornamos a área de resultado visível com animação
+            // Removemos a classe 'hidden' e adicionamos a classe de animação
+            resultadoDiv.classList.remove('hidden');
+            resultadoDiv.classList.add('resultado-animado');
+            
+            // Linha 80: Rolamos a página suavemente até o resultado (boa experiência do usuário)
+            resultadoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Linha 81: Opcional - salvamos no console para debug (útil durante desenvolvimento)
+            console.log(`[IMC] Peso: ${peso}kg | Altura: ${altura}m | IMC: ${imcArredondado} | Classificação: ${classificacao}`);
         }
-    }
-
-    // ESTRELAS
-    for(let i=0; i<80; i++) {
-        const s = document.createElement('div'); s.className = 'star';
-        s.style.cssText = `position:absolute; background:white; width:2px; height:2px; left:${Math.random()*100}vw; top:${Math.random()*100}vh; opacity:0.5;`;
-        container.appendChild(s);
-    }
-
-    setInterval(spawnRussianShip, 1200);
-    setInterval(spawnMeteor, 3500);
-    setInterval(spawnPowerUp, 15000);
-</script>
+        
+        // ================================================
+        // FUNÇÃO: limparCampos()
+        // Limpa os inputs e esconde o resultado
+        // ================================================
+        
+        function limparCampos() {
+            // Linha 82: Limpamos os valores dos inputs
+            document.getElementById('peso').value = '';
+            document.getElementById('altura').value = '';
+            
+            // Linha 83: Escondemos a área de resultado
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.classList.add('hidden');
+            resultadoDiv.classList.remove('resultado-animado');
+            
+            // Linha 84: Focamos no primeiro campo para nova digitação
+            document.getElementById('peso').focus();
+        }
+        
+        // ================================================
+        // FUNÇÃO: reiniciarCalculadora()
+        // Usada pelo botão "Calcular novamente" dentro do resultado
+        // ================================================
+        
+        function reiniciarCalculadora() {
+            // Linha 85: Escondemos o resultado
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.classList.add('hidden');
+            resultadoDiv.classList.remove('resultado-animado');
+            
+            // Linha 86: Limpamos os campos
+            document.getElementById('peso').value = '';
+            document.getElementById('altura').value = '';
+            
+            // Linha 87: Rolamos para o topo do formulário
+            document.getElementById('form-imc').scrollIntoView({ behavior: 'smooth' });
+            
+            // Linha 88: Focamos no campo de peso
+            setTimeout(() => {
+                document.getElementById('peso').focus();
+            }, 500);
+        }
+        
+        // ================================================
+        // EVENT LISTENERS ADICIONAIS (melhor experiência)
+        // ================================================
+        
+        // Linha 89: Quando a página terminar de carregar, configuramos alguns comportamentos extras
+        window.onload = function() {
+            // Linha 90: Permitir calcular apertando Enter nos inputs
+            const inputs = document.querySelectorAll('#peso, #altura');
+            
+            inputs.forEach(input => {
+                // Linha 91: Adicionamos um "ouvinte" de evento de tecla
+                input.addEventListener('keypress', function(event) {
+                    // Linha 92: Se a tecla pressionada for Enter (código 13)
+                    if (event.key === 'Enter') {
+                        // Linha 93: Chamamos a função de calcular
+                        calcularIMC();
+                    }
+                });
+            });
+            
+            // Linha 94: Focamos automaticamente no campo de peso quando a página abre
+            document.getElementById('peso').focus();
+            
+            // Linha 95: Mensagem no console (visível apenas no DevTools - F12)
+            console.log('%c[IMC] Calculadora de IMC carregada com sucesso! (index.html)', 'color: #64748b');
+        };
+        
+        // ================================================
+        // FIM DO JAVASCRIPT
+        // ================================================
+    </script>
 </body>
 </html>

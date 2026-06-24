@@ -1,275 +1,129 @@
-/* ================================================ */
-/* style.css - Estilos da Calculadora de IMC        */
-/* ================================================ */
-/* Este arquivo contém todos os estilos personalizados
-   da calculadora de IMC.
-   
-   COMENTADO LINHA POR LINHA para facilitar o aprendizado.
-   
-   Como usar:
-   1. Crie o arquivo style.css na mesma pasta do index.html
-   2. No index.html, adicione no <head> a linha:
-      <link rel="stylesheet" href="style.css">
-   ================================================ */
+/* ============================================ */
+/* TEMA ESCURO MODERNO - FUNDO PRETO E AZUL   */
+/* ============================================ */
 
+body {
+    background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+    color: #e2e8f0;
+}
 
-/* ================================================ */
-/* ESTILOS DO CARD PRINCIPAL                        */
-/* ================================================ */
-
-/* Linha 1: Estilo do card principal (o container branco grande) */
+/* Card principal com efeito de vidro + borda azul sutil */
 .card-imc {
-    /* Sombra suave e elegante */
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 
-                0 8px 10px -6px rgb(0 0 0 / 0.1);
-    
-    /* Transição suave ao passar o mouse */
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #1e2937;
+    border: 1px solid #334155;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4),
+                0 10px 10px -6px rgb(0 0 0 / 0.3),
+                0 0 0 1px rgba(14, 165, 233, 0.1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1),
+                border-color 0.2s ease;
 }
 
-/* Linha 2: Efeito quando o mouse passa por cima do card */
 .card-imc:hover {
-    /* Levanta o card um pouco */
-    transform: translateY(-4px);
-    
-    /* Aumenta a sombra para dar sensação de profundidade */
-    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-}
-
-
-/* ================================================ */
-/* ESTILOS DOS CAMPOS DE INPUT (PESO E ALTURA)      */
-/* ================================================ */
-
-/* Linha 3: Estilo base dos inputs */
-.input-imc {
-    /* Transição suave ao focar */
-    transition: all 0.2s ease;
-}
-
-/* Linha 4: Estilo quando o input está selecionado (focado) */
-.input-imc:focus {
-    /* Remove a borda padrão azul do navegador */
-    outline: none;
-    
-    /* Cria um anel azul claro ao redor do input */
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
-    
-    /* Muda a cor da borda para azul */
+    transform: translateY(-6px);
+    box-shadow: 0 35px 60px -15px rgb(0 0 0 / 0.5),
+                0 0 0 1px rgba(14, 165, 233, 0.25);
     border-color: #0ea5e9;
 }
 
-
-/* ================================================ */
-/* ANIMAÇÃO DO RESULTADO                            */
-/* ================================================ */
-
-/* Linha 5: Classe que ativa a animação de aparecer */
-.resultado-animado {
-    /* Chama a animação 'fadeInUp' com duração de 0.4 segundos */
-    animation: fadeInUp 0.4s ease forwards;
-}
-
-/* Linha 6: Definição da animação fadeInUp */
-@keyframes fadeInUp {
-    /* Estado inicial da animação */
-    from {
-        opacity: 0;                    /* Começa invisível */
-        transform: translateY(20px);   /* Começa 20px abaixo */
-    }
-    
-    /* Estado final da animação */
-    to {
-        opacity: 1;                    /* Fica totalmente visível */
-        transform: translateY(0);      /* Volta para a posição normal */
-    }
-}
-
-
-/* ================================================ */
-/* ESTILOS DA TABELA DE CLASSIFICAÇÃO               */
-/* ================================================ */
-
-/* Linha 7: Padding (espaçamento interno) das células da tabela */
-.tabela-imc th,
-.tabela-imc td {
-    padding: 12px 16px;     /* 12px em cima/baixo, 16px nas laterais */
-    text-align: left;       /* Alinha o texto à esquerda */
-}
-
-/* Linha 8: Linhas alternadas com fundo cinza claro (melhor legibilidade) */
-.tabela-imc tr:nth-child(even) {
-    background-color: #f8fafc;
-}
-
-
-/* ================================================ */
-/* ESTILOS EXTRAS (BÔNUS)                           */
-/* ================================================ */
-
-/* Linha 9: Estilo para o botão de calcular (pode ser usado se quiser) */
-.btn-calcular {
-    transition: all 0.2s ease;
-}
-
-.btn-calcular:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgb(14 165 233 / 0.3);
-}
-
-/* Linha 10: Estilo para mensagens de erro (caso queira usar no futuro) */
-.mensagem-erro {
-    color: #ef4444;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-/* ================================================ */
-/* FIM DO ARQUIVO style.css                         */
-/* ================================================ */
-/* 
-   Dica: 
-   - Este arquivo está separado para manter o código organizado.
-   - No index.html, não esqueça de adicionar o link:
-     
-     <link rel="stylesheet" href="style.css">
-   
-   - Você também pode adicionar mais estilos aqui conforme for precisando.
-*//* ================================================ */
-/* style.css - Estilos da Calculadora de IMC        */
-/* ================================================ */
-/* Este arquivo contém todos os estilos personalizados
-   da calculadora de IMC.
-   
-   COMENTADO LINHA POR LINHA para facilitar o aprendizado.
-   
-   Como usar:
-   1. Crie o arquivo style.css na mesma pasta do index.html
-   2. No index.html, adicione no <head> a linha:
-      <link rel="stylesheet" href="style.css">
-   ================================================ */
-
-
-/* ================================================ */
-/* ESTILOS DO CARD PRINCIPAL                        */
-/* ================================================ */
-
-/* Linha 1: Estilo do card principal (o container branco grande) */
-.card-imc {
-    /* Sombra suave e elegante */
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 
-                0 8px 10px -6px rgb(0 0 0 / 0.1);
-    
-    /* Transição suave ao passar o mouse */
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* Linha 2: Efeito quando o mouse passa por cima do card */
-.card-imc:hover {
-    /* Levanta o card um pouco */
-    transform: translateY(-4px);
-    
-    /* Aumenta a sombra para dar sensação de profundidade */
-    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-}
-
-
-/* ================================================ */
-/* ESTILOS DOS CAMPOS DE INPUT (PESO E ALTURA)      */
-/* ================================================ */
-
-/* Linha 3: Estilo base dos inputs */
+/* Inputs com tema escuro e foco azul */
 .input-imc {
-    /* Transição suave ao focar */
+    background-color: #0f172a;
+    border: 1px solid #475569;
+    color: #f1f5f9;
     transition: all 0.2s ease;
 }
 
-/* Linha 4: Estilo quando o input está selecionado (focado) */
 .input-imc:focus {
-    /* Remove a borda padrão azul do navegador */
     outline: none;
-    
-    /* Cria um anel azul claro ao redor do input */
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
-    
-    /* Muda a cor da borda para azul */
     border-color: #0ea5e9;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+    background-color: #1e2937;
 }
 
+.input-imc::placeholder {
+    color: #64748b;
+}
 
-/* ================================================ */
-/* ANIMAÇÃO DO RESULTADO                            */
-/* ================================================ */
-
-/* Linha 5: Classe que ativa a animação de aparecer */
+/* Animação do resultado */
 .resultado-animado {
-    /* Chama a animação 'fadeInUp' com duração de 0.4 segundos */
-    animation: fadeInUp 0.4s ease forwards;
+    animation: fadeInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* Linha 6: Definição da animação fadeInUp */
 @keyframes fadeInUp {
-    /* Estado inicial da animação */
     from {
-        opacity: 0;                    /* Começa invisível */
-        transform: translateY(20px);   /* Começa 20px abaixo */
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
     }
-    
-    /* Estado final da animação */
     to {
-        opacity: 1;                    /* Fica totalmente visível */
-        transform: translateY(0);      /* Volta para a posição normal */
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
+/* Tabela de classificação - tema escuro */
+.tabela-imc {
+    background-color: #1e2937;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    overflow: hidden;
+}
 
-/* ================================================ */
-/* ESTILOS DA TABELA DE CLASSIFICAÇÃO               */
-/* ================================================ */
+.tabela-imc th {
+    background-color: #0f172a;
+    color: #e0f2fe;
+    font-weight: 600;
+    padding: 14px 20px;
+}
 
-/* Linha 7: Padding (espaçamento interno) das células da tabela */
-.tabela-imc th,
 .tabela-imc td {
-    padding: 12px 16px;     /* 12px em cima/baixo, 16px nas laterais */
-    text-align: left;       /* Alinha o texto à esquerda */
+    padding: 14px 20px;
+    border-top: 1px solid #334155;
+    color: #cbd5e1;
 }
 
-/* Linha 8: Linhas alternadas com fundo cinza claro (melhor legibilidade) */
-.tabela-imc tr:nth-child(even) {
-    background-color: #f8fafc;
+.tabela-imc tr:hover {
+    background-color: #334155;
 }
 
-
-/* ================================================ */
-/* ESTILOS EXTRAS (BÔNUS)                           */
-/* ================================================ */
-
-/* Linha 9: Estilo para o botão de calcular (pode ser usado se quiser) */
+/* Botão principal com gradiente azul */
 .btn-calcular {
-    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c8 100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 15px -3px rgb(14 165 233 / 0.3),
+                0 4px 6px -4px rgb(14 165 233 / 0.3);
 }
 
 .btn-calcular:hover {
+    background: linear-gradient(135deg, #0284c8 0%, #0369a1 100%);
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgb(14 165 233 / 0.3);
+    box-shadow: 0 20px 25px -5px rgb(14 165 233 / 0.4),
+                0 8px 10px -6px rgb(14 165 233 / 0.4);
 }
 
-/* Linha 10: Estilo para mensagens de erro (caso queira usar no futuro) */
-.mensagem-erro {
-    color: #ef4444;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
+.btn-calcular:active {
+    transform: scale(0.985);
 }
 
-/* ================================================ */
-/* FIM DO ARQUIVO style.css                         */
-/* ================================================ */
-/* 
-   Dica: 
-   - Este arquivo está separado para manter o código organizado.
-   - No index.html, não esqueça de adicionar o link:
-     
-     <link rel="stylesheet" href="style.css">
-   
-   - Você também pode adicionar mais estilos aqui conforme for precisando.
-*/
+/* Labels */
+.label-imc {
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+/* Card do resultado */
+.card-resultado {
+    background: linear-gradient(145deg, #0f172a 0%, #1e2937 100%);
+    border: 1px solid #334155;
+}
+
+/* Nota importante */
+.nota-importante {
+    background-color: #1e2937;
+    border: 1px solid #475569;
+}
+
+/* Emoji com sombra */
+.emoji-result {
+    filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.3));
+}
